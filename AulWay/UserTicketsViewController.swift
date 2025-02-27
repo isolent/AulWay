@@ -7,18 +7,18 @@
 
 import UIKit
 
-struct Slot {
-    let id: String
+struct Slot: Decodable{
+    let id: String 
     let start_date: Date
     let end_date: Date
-    let depature: String
-    let deatinatoin: String
+    let departure: String
+    let destinatoin: String
     let price: Int
     let total_tickets: Int
     let carNumber: String
 }
 
-struct Ticket {
+struct Ticket: Decodable {
     let slot: Slot
     let paid: Bool
     let user_id: String
@@ -26,7 +26,7 @@ struct Ticket {
 
 
 
-class TicketsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate  {
+class UserTicketsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate  {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tickets.deselectRow(at: indexPath, animated: true)
@@ -39,6 +39,10 @@ class TicketsViewController: UIViewController, UITableViewDataSource, UITableVie
         case .upcoming:
             return upcomingTickets.count
         }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 10
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -64,7 +68,7 @@ class TicketsViewController: UIViewController, UITableViewDataSource, UITableVie
         timeFormatter.dateFormat = "HH:mm"
         cell.Time.text = "\(timeFormatter.string(from: ticket.slot.start_date)) - \(timeFormatter.string(from: ticket.slot.end_date))"
 
-        cell.Path.text = "\(ticket.slot.depature) - \(ticket.slot.deatinatoin)"
+        cell.Path.text = "\(ticket.slot.departure) - \(ticket.slot.destinatoin)"
         cell.Status.text = ticket.paid ? "Paid" : "Unpaid"
         
         cell.CarNumber.text = ticket.slot.carNumber
@@ -72,6 +76,8 @@ class TicketsViewController: UIViewController, UITableViewDataSource, UITableVie
 
         return cell
     }
+    
+    
     
     enum TicketType {
         case past
@@ -86,8 +92,8 @@ class TicketsViewController: UIViewController, UITableViewDataSource, UITableVie
                 id: "1",
                 start_date: makeDate(from: "2024-12-01T10:00:00Z"),
                 end_date: makeDate(from: "2024-12-01T14:00:00Z"),
-                depature: "New York",
-                deatinatoin: "Los Angeles",
+                departure: "New York",
+                destinatoin: "Los Angeles",
                 price: 150,
                 total_tickets: 200,
                 carNumber: "505BES05"
@@ -100,8 +106,8 @@ class TicketsViewController: UIViewController, UITableViewDataSource, UITableVie
                 id: "2",
                 start_date: makeDate(from: "2024-11-25T08:00:00Z"),
                 end_date: makeDate(from: "2024-11-25T12:00:00Z"),
-                depature: "San Francisco",
-                deatinatoin: "Seattle",
+                departure: "San Francisco",
+                destinatoin: "Seattle",
                 price: 100,
                 total_tickets: 150,
                 carNumber: "001OVE02"
@@ -114,8 +120,8 @@ class TicketsViewController: UIViewController, UITableViewDataSource, UITableVie
                 id: "3",
                 start_date: makeDate(from: "2024-12-10T09:30:00Z"),
                 end_date: makeDate(from: "2024-12-10T13:30:00Z"),
-                depature: "Chicago",
-                deatinatoin: "Houston",
+                departure: "Chicago",
+                destinatoin: "Houston",
                 price: 120,
                 total_tickets: 180,
                 carNumber: "777BAY07"
@@ -132,8 +138,8 @@ class TicketsViewController: UIViewController, UITableViewDataSource, UITableVie
                 id: "11",
                 start_date: makeDate(from: "2025-01-05T09:00:00Z"),
                 end_date: makeDate(from: "2025-01-05T13:00:00Z"),
-                depature: "New York",
-                deatinatoin: "San Francisco",
+                departure: "New York",
+                destinatoin: "San Francisco",
                 price: 200,
                 total_tickets: 250,
                 carNumber: "222EEE02"
@@ -146,8 +152,8 @@ class TicketsViewController: UIViewController, UITableViewDataSource, UITableVie
                 id: "12",
                 start_date: makeDate(from: "2025-02-10T14:00:00Z"),
                 end_date: makeDate(from: "2025-02-10T18:00:00Z"),
-                depature: "Chicago",
-                deatinatoin: "Miami",
+                departure: "Chicago",
+                destinatoin: "Miami",
                 price: 180,
                 total_tickets: 220,
                 carNumber: "10HAH01"
@@ -160,8 +166,8 @@ class TicketsViewController: UIViewController, UITableViewDataSource, UITableVie
                 id: "13",
                 start_date: makeDate(from: "2025-03-15T07:30:00Z"),
                 end_date: makeDate(from: "2025-03-15T11:30:00Z"),
-                depature: "Houston",
-                deatinatoin: "Denver",
+                departure: "Houston",
+                destinatoin: "Denver",
                 price: 160,
                 total_tickets: 180,
                 carNumber: "12QOR03"
