@@ -32,14 +32,14 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
 
     func fetchTickets() {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.dateFormat = "yyyy-MM-dd" // Ensure API expects this format
         let dateString = dateFormatter.string(from: travelDate)
 
         let passengerNum: Int = 1
         let pageNum = 1
         let pageSizeNum = 10
 
-        print("Departure: \(toLocation), Destination: \(fromLocation), Date: \(dateString), Passengers: \(passengerNum), Page: \(pageNum), PageSize: \(pageSizeNum)")
+        print("Fetching tickets for Departure: \(fromLocation), Destination: \(toLocation), Date: \(dateString), Passengers: \(passengerNum), Page: \(pageNum), PageSize: \(pageSizeNum)")
 
         guard let fromEncoded = fromLocation.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
               let toEncoded = toLocation.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
@@ -47,8 +47,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
                   return
               }
 
-        let urlString = "http://localhost:8080/route?departure=\(fromEncoded)&destination=\(toEncoded)&date=\(dateString)&passengers=\(passengerNum)&page=\(pageNum)&pageSize=\(pageSizeNum)"
-
+        let urlString = "http://localhost:8080/routes?departure=\(fromEncoded)&destination=\(toEncoded)&date=\(dateString)&passengers=\(passengerNum)&page=\(pageNum)&pageSize=\(pageSizeNum)"
 
         guard let url = URL(string: urlString) else {
             print("Invalid URL")
@@ -66,10 +65,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
 
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
                 DispatchQueue.main.async {
-                    self.handleError(message: "Server error. Please try again later. Status code: \(String(describing: (response as? HTTPURLResponse)?.statusCode))")
-                }
-                if let data = data, let responseString = String(data: data, encoding: .utf8) {
-                    print("Server Response: \(responseString)")
+                    self.handleError(message: "Server error. Please try again later.")
                 }
                 return
             }
@@ -83,33 +79,39 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
 
             do {
                 let decoder = JSONDecoder()
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-                decoder.dateDecodingStrategy = .formatted(dateFormatter)
+                decoder.dateDecodingStrategy = .iso8601 // Ensure it decodes dates properly
 
                 let decodedData = try decoder.decode([Slot].self, from: data)
-                print("Decoded Data: \(decodedData)")
+
+                // Filter results based on selected date (if backend does not filter properly)
+                let filteredData = decodedData.filter { slot in
+                    let slotDateString = dateFormatter.string(from: slot.start_date)
+                    return slotDateString == dateString
+                }
+
                 DispatchQueue.main.async {
-                    self.slotList = decodedData
+                    self.slotList = filteredData
                     self.ticketsTableView.reloadData()
-                    print("Slot List Count: \(self.slotList.count)")
+                    print("Filtered Slot List Count: \(self.slotList.count)")
                 }
             } catch {
                 print("Error decoding JSON: \(error)")
-                if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-                    print(json)
-                }
                 DispatchQueue.main.async {
                     self.handleError(message: "Invalid data received from server.")
                 }
-            }
-            if let responseString = String(data: data, encoding: .utf8) {
-                print("Server Response: \(responseString)")
             }
         }
 
         task.resume()
     }
+
+    private func navigateToResultNFViewController() {
+        if let resultNFVC = storyboard?.instantiateViewController(withIdentifier: "ResultNFViewController") {
+            resultNFVC.modalPresentationStyle = .fullScreen
+            present(resultNFVC, animated: true, completion: nil)
+        }
+    }
+
 
     func handleError(message: String) {
         let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
@@ -120,20 +122,6 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return slotList.count
     }
-
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "TicketListTableViewCell", for: indexPath) as! TicketListTableViewCell
-//
-//        let slot = slotList[indexPath.row]
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "hh:mm a"
-//
-//        cell.duration.text = "\(dateFormatter.string(from: slot.start_date)) - \(dateFormatter.string(from: slot.end_date))"
-//        cell.time.text = "\(slot.departure) → \(slot.destination)"
-//        cell.price.text = "\(slot.price) ₸"
-//
-//        return cell
-//    }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TicketListTableViewCell", for: indexPath) as! TicketListTableViewCell
@@ -150,8 +138,9 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
         durationFormatter.allowedUnits = [.hour, .minute]
         let travelTime = durationFormatter.string(from: slot.start_date, to: slot.end_date) ?? "N/A"
 
-        cell.duration.text = "\(travelTime)"
+        cell.duration.text = "\(travelTime) "
         cell.price.text = "\(slot.price) ₸"
+        cell.time.text = "\(timeString)"
 
         return cell
     }
@@ -160,4 +149,3 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
         ticketsTableView.deselectRow(at: indexPath, animated: true)
     }
 }
-

@@ -76,7 +76,7 @@ class HomeViewController: UIViewController {
     }
     
     func fetchTickets(departure: String, destination: String, date: Date, passengers: Int) {
-        let baseURL = "http://localhost:8080/route"
+        let baseURL = "http://localhost:8080/routes"
         var components = URLComponents(string: baseURL)
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"

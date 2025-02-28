@@ -6,15 +6,12 @@
 //
 
 import UIKit
-import FirebaseAuth 
-
-
 
 class SignUpViewController: UIViewController {
     // MARK: - Outlets
     @IBOutlet weak var signInButton: UIButton!
     @IBOutlet weak var emailTextField: UITextField!
-    @IBOutlet weak var confPassTextFiled: UITextField!
+    @IBOutlet weak var confPassTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var signUpButton: UIButton!
     
@@ -23,82 +20,96 @@ class SignUpViewController: UIViewController {
         super.viewDidLoad()
         configureTextField(emailTextField)
         configureTextField(passwordTextField)
-        configureTextField(confPassTextFiled)
-        
+        configureTextField(confPassTextField)
         configureButton(signUpButton)
-        
-        addLeftPadding(to: emailTextField, padding: 14)
-        addLeftPadding(to: passwordTextField, padding: 14)
-        addLeftPadding(to: confPassTextFiled, padding: 14)
-        
     }
     
-    @IBAction func nextButtonTapped(_ sender: UIButton) {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        if let tabBarController = storyboard.instantiateViewController(identifier: "Tickets") as? UITabBarController {
-            UIApplication.shared.windows.first?.rootViewController = tabBarController
-            UIApplication.shared.windows.first?.makeKeyAndVisible()
+    @IBAction func signUpTapped(_ sender: UIButton){
+        guard let email = emailTextField.text, !email.isEmpty,
+              let password = passwordTextField.text, !password.isEmpty,
+              let confirmPassword = confPassTextField.text, confirmPassword == password else {
+            print("⚠️ Please enter valid email and matching passwords")
+            return
+        }
+        
+        registerUser(email: email, password: password)
+    }
+    
+    private func registerUser(email: String, password: String) {
+        let url = URL(string: "http://localhost:8080/auth/signup")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body: [String: Any] = ["email": email, "password": password]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data, error == nil else {
+                print("Network error: \(error?.localizedDescription ?? "Unknown error")")
+
+                return
+            }
+            
+            let jsonString = String(data: data, encoding: .utf8) ?? "No response body"
+            print("📩 Raw Response from Server: \(jsonString)")
+            
+            do {
+                if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                   let accessToken = jsonResponse["access_token"] as? String,
+                   let user = jsonResponse["user"] as? [String: Any],
+                   let userId = user["id"] as? String {
+                    
+                    print("✅ Successfully signed up!")
+                    print("🔑 Token: \(accessToken)")
+                    print("🆔 User ID: \(userId)")
+                    
+                    self.saveUserSession(accessToken: accessToken, userId: userId)
+                    
+                    DispatchQueue.main.async {
+                        self.navigateToSignIn()
+                    }
+                } else {
+                    print("⚠️ Unexpected JSON structure. Check server response.")
+                }
+            } catch {
+                print("❌ JSON Parsing Error: \(error.localizedDescription)")
+            }
+        }
+        task.resume()
+    }
+    
+    private func saveUserSession(accessToken: String, userId: String) {
+        let defaults = UserDefaults.standard
+        defaults.setValue(accessToken, forKey: "access_token")
+        defaults.setValue(userId, forKey: "user_id")
+    }
+    
+    func navigateToSignIn() {
+        DispatchQueue.main.async {
+            if let signInVC = self.storyboard?.instantiateViewController(withIdentifier: "ConfirmRegisterViewController") {
+                self.navigationController?.pushViewController(signInVC, animated: true)
+            }
         }
     }
     
     private func configureTextField(_ textField: UITextField) {
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = UIColor.lightGray.cgColor
-        textField.layer.cornerRadius = emailTextField.frame.height/2
+        textField.layer.cornerRadius = textField.frame.height / 2
         textField.clipsToBounds = true
     }
     
     private func configureButton(_ button: UIButton) {
         button.layer.borderWidth = 1.0
         button.layer.borderColor = UIColor.lightGray.cgColor
-        button.layer.cornerRadius = signInButton.frame.height/1.3
+        button.layer.cornerRadius = button.frame.height / 2
         button.clipsToBounds = true
     }
     
-    func addLeftPadding(to textField: UITextField, padding: CGFloat) {
-        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: padding, height: textField.frame.height))
-        textField.leftView = paddingView
-        textField.leftViewMode = .always
-    }
-    
-    @IBAction func signUpTapped(_ sender: UIButton){
-        guard let email = emailTextField.text, !email.isEmpty,
-              let password = passwordTextField.text, !password.isEmpty else {
-            print("⚠️ Please enter both email and password")
-            return
-        }
-        
-        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
-            if let error = error {
-                print("❌ Sign-up failed: \(error.localizedDescription)")
-                return
-            }
-            
-            guard let user = authResult?.user else {
-                print("❌ User not found after sign-up")
-                return
-            }
-            
-            print("✅ Successfully signed up! User ID: \(user.uid)")
-            
-            user.getIDToken { token, error in
-                if let error = error {
-                    print("❌ Failed to get token: \(error.localizedDescription)")
-                } else if let token = token {
-                    print("🔑 Auth Token: \(token)")
-                }
-            }
-            
-            DispatchQueue.main.async {
-                self.navigateToSignIn()
-            }
-        }
-    }
-    
-    
-    func navigateToSignIn() {
-        if let signInVC = storyboard?.instantiateViewController(withIdentifier: "ConfirmRegisterViewController") {
-            navigationController?.pushViewController(signInVC, animated: true)
-        }
-    }
+//    func addLeftPadding(to textField: UITextField, padding: CGFloat) {
+//        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: padding, height: textField.frame.height))
+//        textField.leftView = paddingView
+//        textField.leftViewMode = .always
+//    }
 }
