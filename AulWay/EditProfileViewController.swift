@@ -8,8 +8,6 @@ class EditProfileViewController: UIViewController {
     @IBOutlet weak var phoneNumberTextField: UITextField!
     @IBOutlet weak var saveButton: UIButton!
     
-    let userId = "user_id" // Replace with actual user ID logic
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         loadUserData()
@@ -20,11 +18,24 @@ class EditProfileViewController: UIViewController {
     }
 
     private func updateUserProfile() {
-        guard let firstName = firstNameTextField.text, !firstName.isEmpty,
-              let lastName = lastNameTextField.text, !lastName.isEmpty,
-              let email = emailTextField.text, !email.isEmpty,
-              let phoneNumber = phoneNumberTextField.text, !phoneNumber.isEmpty else {
+        // Get values from text fields
+        guard let firstName = firstNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !firstName.isEmpty,
+              let lastName = lastNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !lastName.isEmpty,
+              let email = emailTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !email.isEmpty,
+              let phoneNumber = phoneNumberTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !phoneNumber.isEmpty else {
             showAlert(title: "Error", message: "Please fill in all fields.")
+            return
+        }
+
+        // Get user ID from storage
+        guard let userId = UserDefaults.standard.string(forKey: "id"), !userId.isEmpty else {
+            showAlert(title: "Error", message: "User ID not found. Please log in again.")
+            return
+        }
+
+        // Get token from storage
+        guard let token = UserDefaults.standard.string(forKey: "authToken"), !token.isEmpty else {
+            showAlert(title: "Error", message: "Authentication required. Please log in again.")
             return
         }
 
@@ -35,19 +46,20 @@ class EditProfileViewController: UIViewController {
         }
 
         let parameters: [String: Any] = [
-            "firstName": firstName,
-            "lastName": lastName,
+            "firstname": firstName,
+            "lastname": lastName,
             "email": email,
-            "phoneNumber": phoneNumber
+            "phone": phoneNumber
         ]
+
+        print("🔑 Auth Token: \(token)")
+        print("🌍 API URL: \(urlString)")
+        print("📩 Request Parameters: \(parameters)")
 
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        if let token = UIPasteboard.general.string {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        }
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
@@ -68,12 +80,35 @@ class EditProfileViewController: UIViewController {
                     return
                 }
 
+                print("📡 Response Code: \(httpResponse.statusCode)")
+
+                if httpResponse.statusCode == 401 {
+                    self.showAlert(title: "Error", message: "Session expired. Please log in again.")
+                    return
+                }
+
                 if (200...299).contains(httpResponse.statusCode) {
                     do {
-                        let updatedUser = try JSONSerialization.jsonObject(with: data, options: [])
-                        print("Updated User Data: \(updatedUser)") // Prints updated data in console
+                        if let updatedUser = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                            print("✅ Updated User Data: \(updatedUser)")
+                            
+                            let updatedFirstName = updatedUser["firstname"] as? String ?? firstName
+                            let updatedLastName = updatedUser["lastname"] as? String ?? lastName
+                            let updatedEmail = updatedUser["email"] as? String ?? email
+                            let updatedPhone = updatedUser["phone"] as? String ?? phoneNumber
+
+                            self.saveUserData(firstName: updatedFirstName, lastName: updatedLastName, email: updatedEmail, phoneNumber: updatedPhone)
+
+                            self.loadUserData()
+                            
                         
-                        self.showAlert(title: "Success", message: "Profile updated successfully.")
+                            self.showAlert(title: "Success", message: "Profile updated successfully.") { _ in
+                                if let searchVC = self.storyboard?.instantiateViewController(withIdentifier: "Tickets") {
+                                    searchVC.modalPresentationStyle = .fullScreen
+                                    self.present(searchVC, animated: true, completion: nil)
+                                }
+                            }
+                        }
                     } catch {
                         self.showAlert(title: "Error", message: "Failed to parse updated user data.")
                     }
@@ -87,23 +122,24 @@ class EditProfileViewController: UIViewController {
 
     private func saveUserData(firstName: String, lastName: String, email: String, phoneNumber: String) {
         let defaults = UserDefaults.standard
-        defaults.setValue(firstName, forKey: "firstName")
-        defaults.setValue(lastName, forKey: "lastName")
+        defaults.setValue(firstName, forKey: "firstname")
+        defaults.setValue(lastName, forKey: "lastname")
         defaults.setValue(email, forKey: "email")
-        defaults.setValue(phoneNumber, forKey: "phoneNumber")
+        defaults.setValue(phoneNumber, forKey: "phone")
+        defaults.synchronize()
     }
 
     private func loadUserData() {
         let defaults = UserDefaults.standard
-        firstNameTextField.text = defaults.string(forKey: "firstName")
-        lastNameTextField.text = defaults.string(forKey: "lastName")
-        emailTextField.text = defaults.string(forKey: "email")
-        phoneNumberTextField.text = defaults.string(forKey: "phoneNumber")
+        firstNameTextField.text = defaults.string(forKey: "firstname") ?? ""
+        lastNameTextField.text = defaults.string(forKey: "lastname") ?? ""
+        emailTextField.text = defaults.string(forKey: "email") ?? ""
+        phoneNumberTextField.text = defaults.string(forKey: "phone") ?? ""
     }
 
-    private func showAlert(title: String, message: String) {
+    private func showAlert(title: String, message: String, completion: ((UIAlertAction) -> Void)? = nil) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: completion))
         present(alert, animated: true, completion: nil)
     }
 }

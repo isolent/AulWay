@@ -54,7 +54,7 @@ class SignInViewController: UIViewController {
                 if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                    let accessToken = jsonResponse["access_token"] as? String,
                    let user = jsonResponse["user"] as? [String: Any],
-                   let userId = user["id"] as? String, // ID находится внутри "user"
+                   let userId = user["id"] as? String,
                    let firstName = user["firstname"] as? String,
                    let lastName = user["lastname"] as? String,
                    let email = user["email"] as? String,
@@ -67,6 +67,11 @@ class SignInViewController: UIViewController {
                     print("📧 Email: \(email), 📱 Phone: \(phone)")
                     
                     self.saveUserSession(accessToken: accessToken, userId: userId)
+                    
+                    UserDefaults.standard.set(userId, forKey: "id")
+                    UserDefaults.standard.set(accessToken, forKey: "authToken")
+                    UserDefaults.standard.synchronize()
+
                     
                     DispatchQueue.main.async {
                         self.navigateToHome()
