@@ -1,8 +1,6 @@
 //
-//  TicketListViewController.swift
+//  SearchResultViewController.swift
 //  AulWay
-//
-
 //
 
 import UIKit
@@ -17,7 +15,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
     var toLocation: String = ""
     var travelDate: Date = Date()
     var slotList: [Slot] = []
-   
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -32,38 +30,66 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
 
     func fetchTickets() {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd" // Ensure API expects this format
+        dateFormatter.dateFormat = "yyyy-MM-dd"
         let dateString = dateFormatter.string(from: travelDate)
 
         let passengerNum: Int = 1
         let pageNum = 1
         let pageSizeNum = 10
 
-        print("Fetching tickets for Departure: \(fromLocation), Destination: \(toLocation), Date: \(dateString), Passengers: \(passengerNum), Page: \(pageNum), PageSize: \(pageSizeNum)")
+        print("🚀 Fetching tickets for: Departure: \(fromLocation), Destination: \(toLocation), Date: \(dateString), Passengers: \(passengerNum)")
 
         guard let fromEncoded = fromLocation.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
               let toEncoded = toLocation.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
-                  print("Encoding failed")
-                  return
-              }
-
-        let urlString = "http://localhost:8080/routes?departure=\(fromEncoded)&destination=\(toEncoded)&date=\(dateString)&passengers=\(passengerNum)&page=\(pageNum)&pageSize=\(pageSizeNum)"
-
-        guard let url = URL(string: urlString) else {
-            print("Invalid URL")
+            print("⚠️ Encoding failed")
             return
         }
 
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+        let urlString = "http://localhost:8080/api/routes?departure=\(fromEncoded)&destination=\(toEncoded)&date=\(dateString)&passengers=\(passengerNum)&page=\(pageNum)&pageSize=\(pageSizeNum)"
+        
+        guard let url = URL(string: urlString) else {
+            print("❌ Invalid URL")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+//        // 🔹 Add Authorization header
+//        if let token = UserDefaults.standard.string(forKey: "authToken") {
+//            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+//            print("🔑 Authorization Token: Bearer \(token)")
+//        } else {
+//            print("⚠️ No auth token found! API might return 401 Unauthorized.")
+//        }
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                print("Error fetching tickets: \(error.localizedDescription)")
+                print("❌ Network error: \(error.localizedDescription)")
                 DispatchQueue.main.async {
                     self.handleError(message: "Network error. Please try again.")
                 }
                 return
             }
 
-            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("❌ Invalid response from server")
+                return
+            }
+
+//            print("📡 Server Response Status Code: \(httpResponse.statusCode)")
+
+            if httpResponse.statusCode == 401 {
+                print("⚠️ Unauthorized (401) - Token might be missing or expired.")
+                DispatchQueue.main.async {
+                    self.handleError(message: "Session expired. Please log in again.")
+                }
+                return
+            }
+
+            if !(200...299).contains(httpResponse.statusCode) {
+                print("❌ Server error: \(httpResponse.statusCode)")
                 DispatchQueue.main.async {
                     self.handleError(message: "Server error. Please try again later.")
                 }
@@ -79,11 +105,10 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
 
             do {
                 let decoder = JSONDecoder()
-                decoder.dateDecodingStrategy = .iso8601 // Ensure it decodes dates properly
+                decoder.dateDecodingStrategy = .iso8601
 
                 let decodedData = try decoder.decode([Slot].self, from: data)
 
-                // Filter results based on selected date (if backend does not filter properly)
                 let filteredData = decodedData.filter { slot in
                     let slotDateString = dateFormatter.string(from: slot.start_date)
                     return slotDateString == dateString
@@ -92,10 +117,10 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
                 DispatchQueue.main.async {
                     self.slotList = filteredData
                     self.ticketsTableView.reloadData()
-                    print("Filtered Slot List Count: \(self.slotList.count)")
+                    print("✅ Tickets Loaded: \(self.slotList.count)")
                 }
             } catch {
-                print("Error decoding JSON: \(error)")
+                print("❌ JSON Decoding error: \(error)")
                 DispatchQueue.main.async {
                     self.handleError(message: "Invalid data received from server.")
                 }
@@ -112,7 +137,6 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
         }
     }
 
-
     func handleError(message: String) {
         let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
@@ -127,9 +151,9 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
         let cell = tableView.dequeueReusableCell(withIdentifier: "TicketListTableViewCell", for: indexPath) as! TicketListTableViewCell
 
         let slot = slotList[indexPath.row]
-        
+
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "HH:mm" // 24-hour format
+        dateFormatter.dateFormat = "HH:mm"
 
         let timeString = "\(dateFormatter.string(from: slot.start_date)) - \(dateFormatter.string(from: slot.end_date))"
 
@@ -144,7 +168,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
 
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         ticketsTableView.deselectRow(at: indexPath, animated: true)
     }

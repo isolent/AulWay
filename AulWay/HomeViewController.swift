@@ -76,11 +76,11 @@ class HomeViewController: UIViewController {
     }
     
     func fetchTickets(departure: String, destination: String, date: Date, passengers: Int) {
-        let baseURL = "http://localhost:8080/routes"
+        let baseURL = "http://localhost:8080/api/routes"
         var components = URLComponents(string: baseURL)
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-        
+
         components?.queryItems = [
             URLQueryItem(name: "departure", value: departure),
             URLQueryItem(name: "destination", value: destination),
@@ -89,36 +89,53 @@ class HomeViewController: UIViewController {
             URLQueryItem(name: "page", value: "1"),
             URLQueryItem(name: "pageSize", value: "10")
         ]
-        
+
         guard let url = components?.url else {
             print("❌ Invalid URL")
             return
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        
-        if let token = UIPasteboard.general.string {
+
+        // ✅ Fetching authentication token properly
+        if let token = UserDefaults.standard.string(forKey: "authToken"), !token.isEmpty {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        } else {
+            print("❌ No authentication token found.")
+            showAlert(message: "You are not authenticated. Please log in again.")
+            return
         }
-        
+
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
                     self.showAlert(message: "Error: \(error.localizedDescription)")
                     return
                 }
-                
-                guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-                    self.showAlert(message: "Invalid response from server.")
+
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    self.showAlert(message: "No response from server.")
                     return
                 }
-                
+
+                // ✅ Debugging Unauthorized Access
+                if httpResponse.statusCode == 401 {
+                    print("❌ Unauthorized: Invalid token or session expired.")
+                    self.showAlert(message: "Session expired. Please log in again.")
+                    return
+                }
+
+                guard (200...299).contains(httpResponse.statusCode) else {
+                    self.showAlert(message: "Server error: \(httpResponse.statusCode)")
+                    return
+                }
+
                 guard let data = data else {
                     self.showAlert(message: "No data received.")
                     return
                 }
-                
+
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
                     print("✅ Response:", jsonResponse)
@@ -128,9 +145,10 @@ class HomeViewController: UIViewController {
                 }
             }
         }
-        
+
         task.resume()
     }
+
     
     func showAlert(message: String) {
         let alert = UIAlertController(title: "Invalid Input", message: message, preferredStyle: .alert)
