@@ -1,5 +1,4 @@
 import UIKit
-import FirebaseAuth
 
 class ProfileViewController: UIViewController {
     
@@ -27,7 +26,7 @@ class ProfileViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        fetchUserData() // Refresh data when returning to the screen
+        fetchUserData()
     }
     
     private func setupUI() {
@@ -49,15 +48,41 @@ class ProfileViewController: UIViewController {
     }
     
     private func fetchUserData() {
-        let defaults = UserDefaults.standard
-        let firstName = defaults.string(forKey: "firstname") ?? ""
-        let lastName = defaults.string(forKey: "lastname") ?? ""
-        let email = defaults.string(forKey: "email") ?? ""
-        let phone = defaults.string(forKey: "phone") ?? ""
-        
-        nameLabel.text = "\(firstName) \(lastName)"
-        emailLabel.text = email
-        phoneLabel.text = phone
+        guard let accessToken = UserDefaults.standard.string(forKey: "access_token"),
+              let userId = UserDefaults.standard.string(forKey: "user_id") else {
+            print("⚠️ No user session found")
+            return
+        }
+
+        let url = URL(string: "http://localhost:8080/api/users/\(userId)")!
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data, error == nil else {
+                print("❌ Network error: \(error?.localizedDescription ?? "Unknown error")")
+                return
+            }
+
+            // Выводим JSON-ответ сервера в консоль
+            print("📩 Server Response:", String(data: data, encoding: .utf8) ?? "Invalid data")
+
+            do {
+                if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    DispatchQueue.main.async {
+                        let firstName = jsonResponse["first_name"] as? String ?? "N/A"
+                        let lastName = jsonResponse["last_name"] as? String ?? "N/A"
+                        self.nameLabel.text = "\(firstName) \(lastName)"
+                        self.emailLabel.text = jsonResponse["email"] as? String ?? "N/A"
+                        self.phoneLabel.text = jsonResponse["phone"] as? String ?? "N/A"
+                    }
+                }
+            } catch {
+                print("❌ JSON Parsing Error: \(error.localizedDescription)")
+            }
+        }
+        task.resume()
     }
     
     @IBAction func logOutButtonTapped(_ sender: Any) {
@@ -72,23 +97,57 @@ class ProfileViewController: UIViewController {
     }
     
     private func logoutUser() {
-        do {
-            try Auth.auth().signOut()
-            print("✅ Successfully logged out")
-            
-            if let welcomeVC = storyboard?.instantiateViewController(withIdentifier: "wellcome") {
-                welcomeVC.modalPresentationStyle = .fullScreen
-                present(welcomeVC, animated: true, completion: nil)
+        guard let accessToken = UserDefaults.standard.string(forKey: "access_token") else {
+            print("⚠️ No access token found, logging out locally")
+            completeLogout()
+            return
+        }
+
+        let url = URL(string: "http://localhost:8080/auth/logout")!
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("❌ Network error: \(error.localizedDescription)")
+                return
             }
-        } catch let error {
-            print("❌ Error logging out: \(error.localizedDescription)")
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                if httpResponse.statusCode == 200 {
+                    print("✅ Successfully logged out from server")
+                } else {
+                    print("⚠️ Server responded with status code: \(httpResponse.statusCode)")
+                }
+            }
+            
+            DispatchQueue.main.async {
+                self.completeLogout()
+            }
+        }
+        task.resume()
+    }
+
+
+    private func completeLogout() {
+        UserDefaults.standard.removeObject(forKey: "access_token")
+        UserDefaults.standard.removeObject(forKey: "user_id")
+        
+        if let welcomeVC = storyboard?.instantiateViewController(withIdentifier: "wellcome") {
+            welcomeVC.modalPresentationStyle = .fullScreen
+            present(welcomeVC, animated: true, completion: nil)
         }
     }
+
     
     @objc func editProfileTapped() {
-        guard let editProfileVC = storyboard?.instantiateViewController(withIdentifier: "EditProfileViewController") else {
+        guard let editProfileVC = storyboard?.instantiateViewController(withIdentifier: "EditProfileViewController") as? EditProfileViewController else {
             print("❌ Error: Edit Profile screen not found")
             return
+        }
+        editProfileVC.onProfileUpdated = { [weak self] in
+            self?.fetchUserData()
         }
         navigationController?.pushViewController(editProfileVC, animated: true)
     }
