@@ -46,31 +46,37 @@ class SignUpViewController: UIViewController {
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
-                print("Network error: \(error?.localizedDescription ?? "Unknown error")")
-
+                print("❌ Network error: \(error?.localizedDescription ?? "Unknown error")")
                 return
             }
             
-            let jsonString = String(data: data, encoding: .utf8) ?? "No response body"
-            print("📩 Raw Response from Server: \(jsonString)")
-            
             do {
-                if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                   let accessToken = jsonResponse["access_token"] as? String,
-                   let user = jsonResponse["user"] as? [String: Any],
-                   let userId = user["id"] as? String {
+                if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                     
-                    print("✅ Successfully signed up!")
-                    print("🔑 Token: \(accessToken)")
-                    print("🆔 User ID: \(userId)")
-                    
-                    self.saveUserSession(accessToken: accessToken, userId: userId)
-                    
-                    DispatchQueue.main.async {
-                        self.navigateToSignIn()
+                    if let errorMessage = jsonResponse["errDesc"] as? String, errorMessage == "email already exists" {
+                        print("⚠️ Email already registered. Redirecting to UserExistsViewController.")
+                        DispatchQueue.main.async {
+                            self.navigateToUserExists()
+                        }
+                        return
                     }
-                } else {
-                    print("⚠️ Unexpected JSON structure. Check server response.")
+
+                    if let accessToken = jsonResponse["access_token"] as? String,
+                       let user = jsonResponse["user"] as? [String: Any],
+                       let userId = user["id"] as? String {
+                        
+                        print("✅ Successfully signed up!")
+                        print("🔑 Token: \(accessToken)")
+                        print("🆔 User ID: \(userId)")
+                        
+                        self.saveUserSession(accessToken: accessToken, userId: userId)
+                        
+                        DispatchQueue.main.async {
+                            self.navigateToSignIn()
+                        }
+                    } else {
+                        print("⚠️ Unexpected JSON structure. Check server response.")
+                    }
                 }
             } catch {
                 print("❌ JSON Parsing Error: \(error.localizedDescription)")
@@ -78,6 +84,23 @@ class SignUpViewController: UIViewController {
         }
         task.resume()
     }
+
+    func navigateToUserExists() {
+        DispatchQueue.main.async {
+            if let userExistsVC = self.storyboard?.instantiateViewController(withIdentifier: "UserExistsViewController") {
+                self.navigationController?.pushViewController(userExistsVC, animated: true)
+            }
+        }
+    }
+    
+    @IBAction func signInButtonTapped(_ sender: Any) {
+        if let signInVC = storyboard?.instantiateViewController(withIdentifier: "SignInViewController") {
+            signInVC.modalPresentationStyle = .fullScreen
+            present(signInVC, animated: true, completion: nil)
+        }
+    }
+    
+
     
     private func saveUserSession(accessToken: String, userId: String) {
         let defaults = UserDefaults.standard

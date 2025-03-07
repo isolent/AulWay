@@ -86,6 +86,13 @@ class SignInViewController: UIViewController {
         task.resume()
     }
     
+    @IBAction func signUpButtonTapped(_ sender: Any) {
+        if let signUpVC = storyboard?.instantiateViewController(withIdentifier: "SignUpViewController") {
+            signUpVC.modalPresentationStyle = .fullScreen
+            present(signUpVC, animated: true, completion: nil)
+        }
+    }
+    
     private func saveUserSession(accessToken: String, userId: String) {
         let defaults = UserDefaults.standard
         defaults.setValue(accessToken, forKey: "access_token")

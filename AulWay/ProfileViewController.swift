@@ -65,8 +65,8 @@ class ProfileViewController: UIViewController {
                 return
             }
 
-            // Выводим JSON-ответ сервера в консоль
-            print("📩 Server Response:", String(data: data, encoding: .utf8) ?? "Invalid data")
+        
+//            print("📩 Server Response:", String(data: data, encoding: .utf8) ?? "Invalid data")
 
             do {
                 if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
