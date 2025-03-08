@@ -56,13 +56,12 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
         request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-//        // 🔹 Add Authorization header
-//        if let token = UserDefaults.standard.string(forKey: "authToken") {
-//            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-//            print("🔑 Authorization Token: Bearer \(token)")
-//        } else {
-//            print("⚠️ No auth token found! API might return 401 Unauthorized.")
-//        }
+        if let token = UserDefaults.standard.string(forKey: "authToken") {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            print("🔑 Authorization Token: Bearer \(token)")
+        } else {
+            print("⚠️ No auth token found! API might return 401 Unauthorized.")
+        }
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
@@ -78,7 +77,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
                 return
             }
 
-//            print("📡 Server Response Status Code: \(httpResponse.statusCode)")
+            print("📡 Server Response Status Code: \(httpResponse.statusCode)")
 
             if httpResponse.statusCode == 401 {
                 print("⚠️ Unauthorized (401) - Token might be missing or expired.")
@@ -171,5 +170,20 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         ticketsTableView.deselectRow(at: indexPath, animated: true)
+
+        let selectedSlot = slotList[indexPath.row]
+
+        if let detailsVC = storyboard?.instantiateViewController(withIdentifier: "RouteDetailsViewController") as? RouteDetailsViewController {
+            detailsVC.modalPresentationStyle = .automatic
+            detailsVC.modalTransitionStyle = .coverVertical
+
+            detailsVC.selectedSlot = selectedSlot
+            detailsVC.fromLocation = fromLocation
+            detailsVC.toLocation = toLocation
+            detailsVC.travelDate = travelDate
+
+            present(detailsVC, animated: true, completion: nil)
+        }
     }
+
 }

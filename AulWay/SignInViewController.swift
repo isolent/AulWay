@@ -13,6 +13,7 @@ class SignInViewController: UIViewController {
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var signInButton: UIButton!
     
+    @IBOutlet weak var wrongPasswordLabel: UILabel!
     @IBOutlet weak var signUpButton: UIButton!
     // MARK: - View Life Cycle
     override func viewDidLoad() {
@@ -26,10 +27,21 @@ class SignInViewController: UIViewController {
         guard let email = emailTextField.text, !email.isEmpty,
               let password = passwordTextField.text, !password.isEmpty else {
             print("⚠️ Please enter both email and password")
+            showAlert(title: "Missing Information", message: "Please enter both email and password.")
             return
         }
         
         authenticateUser(email: email, password: password)
+    }
+    
+    private func showAlert(title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alertController.addAction(okAction)
+        
+        DispatchQueue.main.async {
+            self.present(alertController, animated: true, completion: nil)
+        }
     }
     
     private func authenticateUser(email: String, password: String) {
@@ -44,15 +56,38 @@ class SignInViewController: UIViewController {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
                 print("❌ Network error: \(error?.localizedDescription ?? "Unknown error")")
+                DispatchQueue.main.async {
+                    self.showErrorMessage("Network error. Please try again.")
+                }
                 return
             }
             
             let jsonString = String(data: data, encoding: .utf8) ?? "No response body"
-            print("📩 Raw Response from Server: \(jsonString)")
+//            print("÷ Raw Response from Server: \(jsonString)")
             
             do {
-                if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                   let accessToken = jsonResponse["access_token"] as? String,
+                
+                guard let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
+                    print("⚠️ JSON Parsing Failed - Invalid format")
+                    DispatchQueue.main.async {
+                        self.showErrorMessage("Invalid server response format.")
+                    }
+                    return
+                }
+                
+//                print("📌 Parsed JSON: \(jsonResponse)")
+                
+                
+                if let errorMessage = jsonResponse["errDesc"] as? String {
+                    print("⚠️ Server Error: \(errorMessage)")
+                    DispatchQueue.main.async {
+                        self.showErrorMessage(errorMessage)
+                    }
+                    return
+                }
+                
+                
+                if let accessToken = jsonResponse["access_token"] as? String,
                    let user = jsonResponse["user"] as? [String: Any],
                    let userId = user["id"] as? String,
                    let firstName = user["firstname"] as? String,
@@ -71,27 +106,33 @@ class SignInViewController: UIViewController {
                     UserDefaults.standard.set(userId, forKey: "id")
                     UserDefaults.standard.set(accessToken, forKey: "authToken")
                     UserDefaults.standard.synchronize()
-
                     
                     DispatchQueue.main.async {
                         self.navigateToHome()
                     }
                 } else {
-                    print("⚠️ Unexpected JSON structure. Check server response.")
+                    print("⚠️ Unexpected JSON structure. Missing fields.")
+                    DispatchQueue.main.async {
+                        self.showErrorMessage("Unexpected server response.")
+                    }
                 }
             } catch {
                 print("❌ JSON Parsing Error: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self.showErrorMessage("Error parsing server response.")
+                }
             }
         }
         task.resume()
     }
     
-    @IBAction func signUpButtonTapped(_ sender: Any) {
-        if let signUpVC = storyboard?.instantiateViewController(withIdentifier: "SignUpViewController") {
-            signUpVC.modalPresentationStyle = .fullScreen
-            present(signUpVC, animated: true, completion: nil)
-        }
+    
+    private func showErrorMessage(_ message: String) {
+        wrongPasswordLabel.text = message
+        wrongPasswordLabel.textColor = .red
+        wrongPasswordLabel.isHidden = false
     }
+    
     
     private func saveUserSession(accessToken: String, userId: String) {
         let defaults = UserDefaults.standard

@@ -6,18 +6,7 @@
 //
 
 import UIKit
-//
-//struct Slot: Decodable{
-//    let id: String 
-//    let start_date: Date
-//    let end_date: Date
-//    let departure: String
-//    let destinatoin: String
-//    let price: Int
-//    let total_tickets: Int
-//    let carNumber: String
-//}
-//
+
 struct Ticket: Codable {
     let slot: Slot
     let paid: Bool
@@ -36,6 +25,7 @@ struct Slot: Codable {
     let created_at: String
     let updated_at: String
     let carNumber: String?
+    let availableSeats: Int?
 
     static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -55,12 +45,13 @@ struct Slot: Codable {
         case created_at
         case updated_at
         case carNumber
+        case availableSeats
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        // Decode required fields
+        
         id = try container.decode(String.self, forKey: .id)
         departure = try container.decode(String.self, forKey: .departure)
         destination = try container.decode(String.self, forKey: .destination)
@@ -69,15 +60,15 @@ struct Slot: Codable {
         price = try container.decode(Int.self, forKey: .price)
         created_at = try container.decode(String.self, forKey: .created_at)
         updated_at = try container.decode(String.self, forKey: .updated_at)
-
-        // Decode dates safely
+        
         let startDateString = try container.decode(String.self, forKey: .start_date)
         let endDateString = try container.decode(String.self, forKey: .end_date)
         start_date = Slot.dateFormatter.date(from: startDateString) ?? Date()
         end_date = Slot.dateFormatter.date(from: endDateString) ?? Date()
 
-        // Decode optional field safely
         carNumber = try container.decodeIfPresent(String.self, forKey: .carNumber)
+        availableSeats = try container.decodeIfPresent(Int.self, forKey: .availableSeats)
+        
     }
 }
 

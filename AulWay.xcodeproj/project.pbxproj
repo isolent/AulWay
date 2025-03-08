@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		139D53552D6BB09F00B16E17 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 139D53542D6BB09F00B16E17 /* FirebaseAnalytics */; };
 		139D53572D6BB09F00B16E17 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */ = {isa = PBXBuildFile; productRef = 139D53562D6BB09F00B16E17 /* FirebaseAnalyticsOnDeviceConversion */; };
 		139D53592D6BB09F00B16E17 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 139D53582D6BB09F00B16E17 /* FirebaseAnalyticsWithoutAdIdSupport */; };
 		139D535B2D6BB09F00B16E17 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = 139D535A2D6BB09F00B16E17 /* FirebaseAppCheck */; };
@@ -102,7 +101,6 @@
 				139D53692D6BB09F00B16E17 /* FirebaseDynamicLinks in Frameworks */,
 				139D535B2D6BB09F00B16E17 /* FirebaseAppCheck in Frameworks */,
 				139D535F2D6BB09F00B16E17 /* FirebaseAuth in Frameworks */,
-				139D53552D6BB09F00B16E17 /* FirebaseAnalytics in Frameworks */,
 				139D536B2D6BB09F00B16E17 /* FirebaseFirestore in Frameworks */,
 				139D53792D6BB09F00B16E17 /* FirebaseMessaging in Frameworks */,
 				139D53752D6BB09F00B16E17 /* FirebaseInstallations in Frameworks */,
@@ -176,7 +174,6 @@
 			);
 			name = AulWay;
 			packageProductDependencies = (
-				139D53542D6BB09F00B16E17 /* FirebaseAnalytics */,
 				139D53562D6BB09F00B16E17 /* FirebaseAnalyticsOnDeviceConversion */,
 				139D53582D6BB09F00B16E17 /* FirebaseAnalyticsWithoutAdIdSupport */,
 				139D535A2D6BB09F00B16E17 /* FirebaseAppCheck */,
@@ -365,8 +362,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CX52754QAF;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AulWay/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -380,8 +379,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = None.AulWay;
+				PRODUCT_BUNDLE_IDENTIFIER = None.AulWay0303;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -393,8 +393,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CX52754QAF;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AulWay/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -408,8 +410,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = None.AulWay;
+				PRODUCT_BUNDLE_IDENTIFIER = None.AulWay0303;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -656,11 +659,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		139D53542D6BB09F00B16E17 /* FirebaseAnalytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 139D53532D6BB09F00B16E17 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalytics;
-		};
 		139D53562D6BB09F00B16E17 /* FirebaseAnalyticsOnDeviceConversion */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 139D53532D6BB09F00B16E17 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
