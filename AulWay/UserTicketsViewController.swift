@@ -19,7 +19,7 @@ struct Ticket: Codable {
     let slot: Slot
     let path: String
     let paid: Bool
-    let qrCodeURL: String
+    let qrCodeBase64: String
 }
 
 struct Slot: Codable {

@@ -8,7 +8,7 @@ class PaymentConfirmationViewController: UIViewController, UITableViewDelegate, 
     var slot: Slot?
     var passengerCount: Int = 1
     
-    var qrCodeURL: String?
+    var qrCodeBase64: String?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,7 +68,7 @@ class PaymentConfirmationViewController: UIViewController, UITableViewDelegate, 
                 do {
                     let ticketDetails = try JSONDecoder().decode(Ticket.self, from: data)
                     self.ticket = ticketDetails
-                    self.qrCodeURL = ticketDetails.qrCodeURL  // ✅ Assigning QR Code URL from ticket
+                    self.qrCodeBase64 = ticketDetails.qrCodeBase64
                     self.fetchRouteDetails(routeId: routeId)
                 } catch {
                     print("❌ Failed to parse ticket details: \(error)")
@@ -141,8 +141,8 @@ class PaymentConfirmationViewController: UIViewController, UITableViewDelegate, 
         let cell = tableView.dequeueReusableCell(withIdentifier: "PaymentCell", for: indexPath) as! PaymentConfirmationCell
         if let ticket = ticket, let slot = slot {
             cell.configure(with: ticket, slot: slot)
-            if let qrCodeURL = qrCodeURL {
-                cell.loadQRCode(from: qrCodeURL)
+            if let qrCodeBase64 = qrCodeBase64 {
+                cell.loadQRCode(from: qrCodeBase64)
             }
         }
         return cell

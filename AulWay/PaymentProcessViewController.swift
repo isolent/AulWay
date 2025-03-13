@@ -14,7 +14,7 @@ class PaymentProcessViewController: UIViewController {
     
     var id: String = ""
     var passengerCount: Int = 1
-    var qrCodeURL: String?
+    var qrCodeBase64: String?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -89,9 +89,13 @@ class PaymentProcessViewController: UIViewController {
                         print("Server response:", firstTicket)
                         
                         if let status = firstTicket["payment_status"] as? String, status == "pending",
-                           let qrCodePath = firstTicket["qr_code"] as? String {
-                            self.qrCodeURL = "http://localhost:8080/\(qrCodePath)"
-                            self.navigateToPaymentConfirmation()
+                           let qrCodeBase64 = firstTicket["qr_code"] as? String {
+                            
+                            self.qrCodeBase64 = qrCodeBase64
+                            
+                            DispatchQueue.main.async {
+                                self.navigateToPaymentConfirmation()
+                            }
                         } else {
                             self.showAlert(title: "Error", message: "Payment failed. Please try again.")
                         }
@@ -110,7 +114,7 @@ class PaymentProcessViewController: UIViewController {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         if let confirmationVC = storyboard.instantiateViewController(withIdentifier: "PaymentConfirmationViewController") as? PaymentConfirmationViewController {
             confirmationVC.id = self.id
-            confirmationVC.qrCodeURL = self.qrCodeURL
+            confirmationVC.qrCodeBase64 = self.qrCodeBase64
             self.navigationController?.pushViewController(confirmationVC, animated: true)
         }
     }
