@@ -81,7 +81,7 @@ class PaymentConfirmationViewController: UIViewController, UITableViewDelegate, 
     func fetchRouteDetails(routeId: String) {
         guard let authToken = UserDefaults.standard.string(forKey: "authToken"), !authToken.isEmpty else {
             print("⚠️ Token not found")
-            showAlert(title: "Error", message: "Authorization token is missing")
+            showAlert(title: "Error", message: "Отсутствует токен авторизации")
             return
         }
         
@@ -119,7 +119,7 @@ class PaymentConfirmationViewController: UIViewController, UITableViewDelegate, 
                     print("✅ Route fetched: \(slotDetails)")
                     self.tableView.reloadData()
                 } catch {
-                    self.showAlert(title: "Error", message: "Failed to parse route details.")
+                    self.showAlert(title: "Error", message: "Не удалось проанализировать детали маршрута.")
                     print("❌ Decoding error: \(error)")
                 }
             }

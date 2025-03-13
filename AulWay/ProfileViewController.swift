@@ -86,10 +86,10 @@ class ProfileViewController: UIViewController {
     }
     
     @IBAction func logOutButtonTapped(_ sender: Any) {
-        let alert = UIAlertController(title: "Log Out", message: "Are you sure you want to log out?", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Выйти", message: "Вы уверены, что хотите выйти из системы?", preferredStyle: .alert)
         
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: "Log Out", style: .destructive, handler: { _ in
+        alert.addAction(UIAlertAction(title: "Закрыть", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Выйти", style: .destructive, handler: { _ in
             self.logoutUser()
         }))
         

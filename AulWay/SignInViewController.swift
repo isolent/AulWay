@@ -57,20 +57,20 @@ class SignInViewController: UIViewController {
             guard let data = data, error == nil else {
                 print("❌ Network error: \(error?.localizedDescription ?? "Unknown error")")
                 DispatchQueue.main.async {
-                    self.showErrorMessage("Network error. Please try again.")
+                    self.showErrorMessage("Ошибка сети. Пожалуйста, попробуйте снова.")
                 }
                 return
             }
             
             let jsonString = String(data: data, encoding: .utf8) ?? "No response body"
-//            print("÷ Raw Response from Server: \(jsonString)")
+//            print("Raw Response from Server: \(jsonString)")
             
             do {
                 
                 guard let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
                     print("⚠️ JSON Parsing Failed - Invalid format")
                     DispatchQueue.main.async {
-                        self.showErrorMessage("Invalid server response format.")
+                        self.showErrorMessage("Недопустимый формат ответа сервера.")
                     }
                     return
                 }

@@ -129,10 +129,4 @@ class SignUpViewController: UIViewController {
         button.layer.cornerRadius = button.frame.height / 2
         button.clipsToBounds = true
     }
-    
-//    func addLeftPadding(to textField: UITextField, padding: CGFloat) {
-//        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: padding, height: textField.frame.height))
-//        textField.leftView = paddingView
-//        textField.leftViewMode = .always
-//    }
 }

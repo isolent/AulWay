@@ -441,19 +441,19 @@
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="background" translatesAutoresizingMaskIntoConstraints="NO" id="Abx-el-eXf">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Мои билеты" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T61-xj-EUc">
-                                <rect key="frame" x="29" y="108" width="114" height="27.333333333333343"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="МОИ БИЛЕТЫ" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T61-xj-EUc">
+                                <rect key="frame" x="50" y="108" width="143" height="27.333333333333343"/>
                                 <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="20"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <stackView opaque="NO" contentMode="scaleToFill" spacing="33" translatesAutoresizingMaskIntoConstraints="NO" id="gFw-rv-gMm">
-                                <rect key="frame" x="46" y="165.33333333333334" width="301" height="40"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="gFw-rv-gMm">
+                                <rect key="frame" x="60" y="165.33333333333334" width="273" height="50"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Rl-tJ-tGu">
-                                        <rect key="frame" x="0.0" y="0.0" width="134" height="40"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="134" height="50"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="40" id="23T-3Y-xwh"/>
+                                            <constraint firstAttribute="height" constant="50" id="23T-3Y-xwh"/>
                                         </constraints>
                                         <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <state key="normal" title="Button"/>
@@ -467,9 +467,9 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Z1-Yr-b4w">
-                                        <rect key="frame" x="167" y="0.0" width="134" height="40"/>
+                                        <rect key="frame" x="139" y="0.0" width="134" height="50"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="40" id="Qoz-Cn-hNl"/>
+                                            <constraint firstAttribute="height" constant="50" id="Qoz-Cn-hNl"/>
                                         </constraints>
                                         <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <state key="normal" title="Button"/>
@@ -485,7 +485,7 @@
                                 </subviews>
                             </stackView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="Xtg-Zy-nae">
-                                <rect key="frame" x="25" y="230.33333333333331" width="343" height="538.66666666666674"/>
+                                <rect key="frame" x="25" y="240.33333333333331" width="343" height="528.66666666666674"/>
                                 <color key="backgroundColor" white="1" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="tintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                 <color key="separatorColor" red="0.0" green="0.47843137250000001" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -578,16 +578,16 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Xtg-Zy-nae" firstAttribute="top" secondItem="gFw-rv-gMm" secondAttribute="bottom" constant="25" id="2pM-TN-xfD"/>
-                            <constraint firstItem="T61-xj-EUc" firstAttribute="leading" secondItem="z96-dH-gaA" secondAttribute="leading" constant="29" id="44U-Mx-Gug"/>
+                            <constraint firstItem="T61-xj-EUc" firstAttribute="leading" secondItem="z96-dH-gaA" secondAttribute="leading" constant="50" id="44U-Mx-Gug"/>
                             <constraint firstItem="Xtg-Zy-nae" firstAttribute="leading" secondItem="z96-dH-gaA" secondAttribute="leading" constant="25" id="9cg-n4-wHl"/>
                             <constraint firstItem="Abx-el-eXf" firstAttribute="top" secondItem="8qs-yT-fyO" secondAttribute="top" id="DSJ-PF-ISV"/>
+                            <constraint firstItem="z96-dH-gaA" firstAttribute="trailing" secondItem="T61-xj-EUc" secondAttribute="trailing" constant="200" id="F7b-rV-Rmc"/>
                             <constraint firstItem="Abx-el-eXf" firstAttribute="trailing" secondItem="z96-dH-gaA" secondAttribute="trailing" id="JXj-kS-j6j"/>
                             <constraint firstItem="T61-xj-EUc" firstAttribute="top" secondItem="z96-dH-gaA" secondAttribute="top" constant="5" id="LzI-eq-hYA"/>
                             <constraint firstAttribute="bottom" secondItem="Abx-el-eXf" secondAttribute="bottom" id="SOb-KG-afr"/>
                             <constraint firstItem="gFw-rv-gMm" firstAttribute="top" secondItem="T61-xj-EUc" secondAttribute="bottom" constant="30" id="Uan-xV-o2x"/>
                             <constraint firstItem="Abx-el-eXf" firstAttribute="leading" secondItem="8qs-yT-fyO" secondAttribute="leading" id="V5t-EO-w23"/>
                             <constraint firstItem="gFw-rv-gMm" firstAttribute="centerX" secondItem="8qs-yT-fyO" secondAttribute="centerX" id="WIO-Bx-46Q"/>
-                            <constraint firstItem="z96-dH-gaA" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="T61-xj-EUc" secondAttribute="trailing" symbolic="YES" id="eEQ-Vc-qQf"/>
                             <constraint firstItem="z96-dH-gaA" firstAttribute="bottom" secondItem="Xtg-Zy-nae" secondAttribute="bottom" id="ixn-cW-yah"/>
                             <constraint firstItem="z96-dH-gaA" firstAttribute="trailing" secondItem="Xtg-Zy-nae" secondAttribute="trailing" constant="25" id="uAj-GK-ZgL"/>
                         </constraints>
@@ -607,7 +607,7 @@
         <scene sceneID="tJ5-tT-v7c">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="omG-gA-Ble" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Home" image="house" catalog="system" selectedImage="house" id="3sd-DY-1HE">
+                    <tabBarItem key="tabBarItem" title="Home" image="house" catalog="system" selectedImage="house" id="3sd-DY-1HE" userLabel="Главное">
                         <color key="badgeColor" red="0.4941176471" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </tabBarItem>
                     <toolbarItems/>
@@ -652,7 +652,7 @@
         <scene sceneID="zFo-7K-pT5">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="LJa-tN-3Iv" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Tickets" image="ticket" catalog="system" id="Kpp-D8-oWy"/>
+                    <tabBarItem key="tabBarItem" title="Tickets" image="ticket" catalog="system" id="Kpp-D8-oWy" userLabel="Билеты"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="eeM-ay-WFw">
                         <rect key="frame" x="0.0" y="59" width="393" height="44"/>
@@ -821,7 +821,7 @@
         <scene sceneID="Mrj-hA-XIJ">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Bzq-tK-lpP" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Profile" image="person.crop.circle" catalog="system" id="3tx-Jd-UpK"/>
+                    <tabBarItem key="tabBarItem" title="Profile" image="person.crop.circle" catalog="system" id="3tx-Jd-UpK" userLabel="Профиль"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="Lac-F2-2od">
                         <rect key="frame" x="0.0" y="59" width="393" height="44"/>
@@ -840,7 +840,7 @@
         <scene sceneID="SQb-KR-CG5">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="3co-Mb-PZB" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Settings" image="gearshape" catalog="system" id="hYm-kM-ZDN"/>
+                    <tabBarItem key="tabBarItem" title="Settings" image="gearshape" catalog="system" id="hYm-kM-ZDN" userLabel="Настройки"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="OWB-pF-bRG">
                         <rect key="frame" x="0.0" y="59" width="393" height="44"/>

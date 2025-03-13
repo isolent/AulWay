@@ -98,41 +98,41 @@ class HomeViewController: UIViewController {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
 
-        // ✅ Fetching authentication token properly
+
         if let token = UserDefaults.standard.string(forKey: "authToken"), !token.isEmpty {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         } else {
-            print("❌ No authentication token found.")
-            showAlert(message: "You are not authenticated. Please log in again.")
+//            print("❌ No authentication token found.")
+            showAlert(message: "Вы не вошли. Пожалуйста, войдите в систему еще раз.")
             return
         }
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    self.showAlert(message: "Error: \(error.localizedDescription)")
+                    self.showAlert(message: "Ошибка: \(error.localizedDescription)")
                     return
                 }
 
                 guard let httpResponse = response as? HTTPURLResponse else {
-                    self.showAlert(message: "No response from server.")
+                    self.showAlert(message: "Нет ответа от сервера.")
                     return
                 }
 
                 // ✅ Debugging Unauthorized Access
                 if httpResponse.statusCode == 401 {
-                    print("❌ Unauthorized: Invalid token or session expired.")
-                    self.showAlert(message: "Session expired. Please log in again.")
+//                    print("❌ Unauthorized: Invalid token or session expired.")
+                    self.showAlert(message: "Сеанс истек. Пожалуйста, войдите в систему еще раз.")
                     return
                 }
 
                 guard (200...299).contains(httpResponse.statusCode) else {
-                    self.showAlert(message: "Server error: \(httpResponse.statusCode)")
+                    self.showAlert(message: "Ошибка сервера: \(httpResponse.statusCode)")
                     return
                 }
 
                 guard let data = data else {
-                    self.showAlert(message: "No data received.")
+                    self.showAlert(message: "Данные не получены.")
                     return
                 }
 

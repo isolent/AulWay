@@ -30,7 +30,7 @@ class PaymentProcessViewController: UIViewController {
               let cardNumber = cardNumberTextField.text, !cardNumber.isEmpty,
               let expiration = expirationTextField.text, !expiration.isEmpty,
               let cvc = cvcTextField.text, !cvc.isEmpty else {
-            showAlert(title: "Error", message: "Please fill in all fields.")
+            showAlert(title: "Error", message: "Пожалуйста, заполните все поля.")
             return
         }
         
@@ -78,7 +78,7 @@ class PaymentProcessViewController: UIViewController {
                 }
                 
                 guard let data = data else {
-                    self.showAlert(title: "Error", message: "No response from server.")
+                    self.showAlert(title: "Error", message: "Нет ответа от сервера.")
                     return
                 }
                 
@@ -97,13 +97,13 @@ class PaymentProcessViewController: UIViewController {
                                 self.navigateToPaymentConfirmation()
                             }
                         } else {
-                            self.showAlert(title: "Error", message: "Payment failed. Please try again.")
+                            self.showAlert(title: "Error", message: "Оплата не была произведена. Пожалуйста, попробуйте снова.")
                         }
                     } else {
-                        self.showAlert(title: "Error", message: "Unexpected response format.")
+                        self.showAlert(title: "Error", message: "Неожиданный формат ответа.")
                     }
                 } catch {
-                    self.showAlert(title: "Error", message: "Failed to process server response.")
+                    self.showAlert(title: "Error", message: "Не удалось обработать ответ сервера.")
                 }
             }
         }

@@ -82,9 +82,8 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
             print("📡 Server Response Status Code: \(httpResponse.statusCode)")
 
             if httpResponse.statusCode == 401 {
-                print("⚠️ Unauthorized (401) - Token might be missing or expired.")
                 DispatchQueue.main.async {
-                    self.handleError(message: "Session expired. Please log in again.")
+                    self.handleError(message: "Сеанс истек. Пожалуйста, войдите в систему еще раз.")
                 }
                 return
             }
@@ -92,7 +91,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
             if !(200...299).contains(httpResponse.statusCode) {
                 print("❌ Server error: \(httpResponse.statusCode)")
                 DispatchQueue.main.async {
-                    self.handleError(message: "Server error. Please try again later.")
+                    self.handleError(message: "Ошибка сервера. Пожалуйста, повторите попытку позже.")
                 }
                 return
             }
@@ -127,7 +126,6 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
                         print("✅ Tickets Loaded: \(self.slotList.count), Route ID: \(self.routeId)")
                     } else {
                         self.routeId = ""
-                        print("⚠️ No slots found. Route ID set to empty.")
                     }
 
                     self.ticketsTableView.reloadData()
@@ -154,7 +152,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
     }
 
     func handleError(message: String) {
-        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }

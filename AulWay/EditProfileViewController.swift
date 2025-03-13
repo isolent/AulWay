@@ -23,7 +23,7 @@ class EditProfileViewController: UIViewController {
     private func fetchUserProfile() {
         guard let userId = UserDefaults.standard.string(forKey: "id"),
               let token = UserDefaults.standard.string(forKey: "authToken") else {
-            print("⚠️ No user data found, skipping fetch.")
+//            print("⚠️ No user data found, skipping fetch.")
             return
         }
 
@@ -37,12 +37,12 @@ class EditProfileViewController: UIViewController {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    self.showAlert(title: "Error", message: "Fetch error: \(error.localizedDescription)")
+                    self.showAlert(title: "Ошибка", message: "Ошибка выборки: \(error.localizedDescription)")
                     return
                 }
 
                 guard let httpResponse = response as? HTTPURLResponse, let data = data, httpResponse.statusCode == 200 else {
-                    self.showAlert(title: "Error", message: "Failed to fetch profile. Status: \((response as? HTTPURLResponse)?.statusCode ?? 0)")
+                    self.showAlert(title: "Ошибка", message: "Не удалось получить профиль. Статус: \((response as? HTTPURLResponse)?.statusCode ?? 0)")
                     return
                 }
 
@@ -59,7 +59,7 @@ class EditProfileViewController: UIViewController {
                         self.phoneNumberTextField.text = phone
                     }
                 } catch {
-                    self.showAlert(title: "Error", message: "Failed to parse profile data: \(error)")
+                    self.showAlert(title: "Ошибка", message: "Не удалось проанализировать данные профиля: \(error)")
                 }
             }
         }
@@ -71,19 +71,19 @@ class EditProfileViewController: UIViewController {
               let lastName = lastNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !lastName.isEmpty,
               let email = emailTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !email.isEmpty,
               let phoneNumber = phoneNumberTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !phoneNumber.isEmpty else {
-            showAlert(title: "Error", message: "Please fill in all fields.")
+            showAlert(title: "Ошибка", message: "Пожалуйста, заполните все поля.")
             return
         }
 
         guard let userId = UserDefaults.standard.string(forKey: "id"),
               let token = UserDefaults.standard.string(forKey: "authToken") else {
-            showAlert(title: "Error", message: "User session expired. Please log in again.")
+            showAlert(title: "Ошибка", message: "Срок действия пользовательской сессии истек. Пожалуйста, войдите в систему еще раз.")
             return
         }
 
         let urlString = "http://localhost:8080/api/users/\(userId)"
         guard let url = URL(string: urlString) else {
-            showAlert(title: "Error", message: "Invalid URL.")
+            showAlert(title: "Ошибка", message: "Неверный URL-адрес.")
             return
         }
 
@@ -102,19 +102,19 @@ class EditProfileViewController: UIViewController {
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
         } catch {
-            showAlert(title: "Error", message: "Failed to encode data.")
+            showAlert(title: "Ошибка", message: "Не удалось закодировать данные.")
             return
         }
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    self.showAlert(title: "Error", message: "Request failed: \(error.localizedDescription)")
+                    self.showAlert(title: "Ошибка", message: "Запрос не выполнен: \(error.localizedDescription)")
                     return
                 }
 
                 guard let httpResponse = response as? HTTPURLResponse, let data = data else {
-                    self.showAlert(title: "Error", message: "No response from server.")
+                    self.showAlert(title: "Ошибка", message: "Нет ответа от сервера.")
                     return
                 }
 
@@ -122,9 +122,9 @@ class EditProfileViewController: UIViewController {
                 case 200...299:
                     self.handleSuccessfulUpdate(with: data)
                 case 401:
-                    self.showAlert(title: "Error", message: "Session expired. Please log in again.")
+                    self.showAlert(title: "Ошибка", message: "Сеанс истек. Пожалуйста, войдите в систему еще раз.")
                 default:
-                    self.showAlert(title: "Error", message: "Server error. Status code: \(httpResponse.statusCode)")
+                    self.showAlert(title: "Ошибка", message: "Ошибка сервера. Код состояния: \(httpResponse.statusCode)")
                 }
             }
         }
@@ -148,7 +148,7 @@ class EditProfileViewController: UIViewController {
                 }
             }
         } catch {
-            showAlert(title: "Error", message: "Failed to parse updated user data.")
+            showAlert(title: "Ошибка", message: "Failed to parse updated user data.")
         }
     }
 
