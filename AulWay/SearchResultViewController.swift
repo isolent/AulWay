@@ -15,6 +15,8 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
     var toLocation: String = ""
     var travelDate: Date = Date()
     var slotList: [Slot] = []
+    var routeId: String = ""
+    var passengerCount: Int = 1
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,6 +103,10 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
                 }
                 return
             }
+            
+            if let jsonString = String(data: data, encoding: .utf8) {
+                    print("📡 Raw JSON Response: \(jsonString)")
+                }
 
             do {
                 let decoder = JSONDecoder()
@@ -115,9 +121,19 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
 
                 DispatchQueue.main.async {
                     self.slotList = filteredData
+
+                    if let firstSlot = self.slotList.first {
+                        self.routeId = firstSlot.id ?? ""
+                        print("✅ Tickets Loaded: \(self.slotList.count), Route ID: \(self.routeId)")
+                    } else {
+                        self.routeId = ""
+                        print("⚠️ No slots found. Route ID set to empty.")
+                    }
+
                     self.ticketsTableView.reloadData()
-                    print("✅ Tickets Loaded: \(self.slotList.count)")
                 }
+
+
             } catch {
                 print("❌ JSON Decoding error: \(error)")
                 DispatchQueue.main.async {
@@ -128,6 +144,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
 
         task.resume()
     }
+
 
     private func navigateToResultNFViewController() {
         if let resultNFVC = storyboard?.instantiateViewController(withIdentifier: "ResultNFViewController") {
@@ -181,6 +198,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
             detailsVC.fromLocation = fromLocation
             detailsVC.toLocation = toLocation
             detailsVC.travelDate = travelDate
+            detailsVC.passengerCount = passengerCount
 
             present(detailsVC, animated: true, completion: nil)
         }

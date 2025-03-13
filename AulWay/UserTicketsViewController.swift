@@ -8,9 +8,18 @@
 import UIKit
 
 struct Ticket: Codable {
-    let slot: Slot
-    let paid: Bool
+    let id: String
     let user_id: String
+    let route_id: String
+    let price: Int
+    let status: String
+    let payment_status: String
+    let qr_code: String
+    let created_at: String
+    let slot: Slot
+    let path: String
+    let paid: Bool
+    let qrCodeURL: String
 }
 
 struct Slot: Codable {
@@ -68,7 +77,6 @@ struct Slot: Codable {
 
         carNumber = try container.decodeIfPresent(String.self, forKey: .carNumber)
         availableSeats = try container.decodeIfPresent(Int.self, forKey: .availableSeats)
-        
     }
 }
 

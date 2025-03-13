@@ -17,11 +17,12 @@ class RouteDetailsViewController: UIViewController {
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var startTime: UILabel!
     @IBOutlet weak var endTime: UILabel!
-    @IBOutlet weak var routeDuration: UILabel! // New outlet
+    @IBOutlet weak var routeDuration: UILabel!
 
     @IBOutlet var departureLabels: [UILabel]!
     @IBOutlet var destinationLabels: [UILabel]!
-
+    
+    var passengerCount: Int = 1
     var selectedSlot: Slot?
     var fromLocation: String = ""
     var toLocation: String = ""
@@ -30,7 +31,6 @@ class RouteDetailsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Ensure the selected slot is available
         if let slot = selectedSlot {
             availableSeatNumber.text = "\(slot.availableSeats)"
             priceLabel.text = "\(slot.price) ₸"
@@ -44,7 +44,6 @@ class RouteDetailsViewController: UIViewController {
             startTime.text = timeFormatter.string(from: start)
             endTime.text = timeFormatter.string(from: end)
 
-            // Calculate route duration
             let duration = end.timeIntervalSince(start)
             let hours = Int(duration) / 3600
             let minutes = (Int(duration) % 3600) / 60
@@ -62,9 +61,22 @@ class RouteDetailsViewController: UIViewController {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(closeView))
         closeButton.isUserInteractionEnabled = true
         closeButton.addGestureRecognizer(tapGesture)
+
+        buyButton.addTarget(self, action: #selector(buyButtonTapped), for: .touchUpInside)
     }
 
     @objc func closeView() {
         dismiss(animated: true, completion: nil)
+    }
+
+    @objc func buyButtonTapped() {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        if let paymentVC = storyboard.instantiateViewController(withIdentifier: "PaymentProcessViewController") as? PaymentProcessViewController {
+            paymentVC.modalPresentationStyle = .automatic
+            paymentVC.modalTransitionStyle = .coverVertical
+            paymentVC.passengerCount = passengerCount
+            paymentVC.id = selectedSlot?.id ?? ""
+            present(paymentVC, animated: true, completion: nil)
+        }
     }
 }

@@ -44,7 +44,7 @@ class LoadingViewController: UIViewController {
                 ticketListVC.fromLocation = fromLocation
                 ticketListVC.toLocation = toLocation
                 ticketListVC.travelDate = travelDate
-//                ticketListVC.passengerCount = passengerCount
+                ticketListVC.passengerCount = passengerCount
             }
         }
         
