@@ -1,41 +1,62 @@
+//
+//  PaymentConfirmationViewController.swift
+//  AulWay
+//
+//  Created by Aruzhan Kaharmanova on 10.03.2025.
+//
+
 import UIKit
 
 class PaymentConfirmationViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    
     @IBOutlet weak var tableView: UITableView!
     
-    var id: String = ""
-    var ticket: Ticket?
-    var slot: Slot?
+    var tickets: [Ticket] = []
+    var slots: [Slot] = []
     var passengerCount: Int = 1
-    
-    var qrCodeBase64: String?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupTableView()
+        fetchPassengerCount()
+        loadTicketDetails()
+    }
+
+    private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.register(UINib(nibName: "PaymentConfirmationCell", bundle: nil), forCellReuseIdentifier: "PaymentCell")
-        
-        fetchPassengerCount()
-        fetchTicketDetails(routeId: id)
     }
 
-    func fetchPassengerCount() {
+    private func fetchPassengerCount() {
         if let homeVC = presentingViewController as? HomeViewController {
-            self.passengerCount = homeVC.passengerCount
-            print("👥 Passenger count fetched: \(passengerCount)")
+            passengerCount = homeVC.passengerCount
+            print("👥 Passenger count: \(passengerCount)")
         }
     }
-
-    func fetchTicketDetails(routeId: String) {
-        guard let authToken = UserDefaults.standard.string(forKey: "authToken") else {
-            print("❌ No auth token found in UserDefaults")
+    
+    private func loadTicketDetails() {
+        guard !tickets.isEmpty else {
+            showAlert(title: "Ошибка", message: "Данные билетов отсутствуют.")
             return
         }
 
-        let urlString = "http://localhost:8080/api/tickets/\(routeId)"
+        let routeIds = Set(tickets.compactMap { $0.route_id })
+        
+        for routeId in routeIds {
+            print("🛣 Fetching route for ID: \(routeId)")
+            fetchSlotDetails(routeId: routeId)
+        }
+    }
+
+    private func fetchSlotDetails(routeId: String) {
+        guard let authToken = UserDefaults.standard.string(forKey: "authToken"), !authToken.isEmpty else {
+            print("❌ Ошибка: нет authToken")
+            return
+        }
+
+        let urlString = "http://localhost:8080/api/routes/\(routeId)"
         guard let url = URL(string: urlString) else {
-            print("❌ Invalid URL: \(urlString)")
+            print("❌ Invalid URL")
             return
         }
 
@@ -43,108 +64,63 @@ class PaymentConfirmationViewController: UIViewController, UITableViewDelegate, 
         request.httpMethod = "GET"
         request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
 
-        print("📢 Sending request to: \(urlString)")
-        print("🔑 Token: \(authToken)")
-
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    print("❌ Network error: \(error.localizedDescription)")
-                    return
-                }
-
-                if let httpResponse = response as? HTTPURLResponse {
-                    print("📌 HTTP Status Code: \(httpResponse.statusCode)")
-                    if httpResponse.statusCode == 401 {
-                        print("❌ Unauthorized: Invalid token or missing authorization header.")
-                    }
-                }
-
-                guard let data = data else {
-                    print("❌ No data received.")
-                    return
-                }
-
-                do {
-                    let ticketDetails = try JSONDecoder().decode(Ticket.self, from: data)
-                    self.ticket = ticketDetails
-                    self.qrCodeBase64 = ticketDetails.qrCodeBase64
-                    self.fetchRouteDetails(routeId: routeId)
-                } catch {
-                    print("❌ Failed to parse ticket details: \(error)")
-                }
+        URLSession.shared.dataTask(with: request) { (data, response, error) in
+            if let error = error {
+                print("❌ Network Error: \(error.localizedDescription)")
+                return
             }
-        }
-        task.resume()
-    }
 
-    func fetchRouteDetails(routeId: String) {
-        guard let authToken = UserDefaults.standard.string(forKey: "authToken"), !authToken.isEmpty else {
-            print("⚠️ Token not found")
-            showAlert(title: "Error", message: "Отсутствует токен авторизации")
-            return
-        }
-        
-        let urlString = "http://localhost:8080/api/routes/\(routeId)"
-        guard let url = URL(string: urlString) else {
-            showAlert(title: "Error", message: "Invalid URL")
-            return
-        }
+            guard let data = data else {
+                print("❌ No data received for slot details")
+                return
+            }
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.addValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
-        
-        print("🔗 Fetching route details from: \(urlString)")
+            if let httpResponse = response as? HTTPURLResponse {
+                print("🔄 HTTP Status Code: \(httpResponse.statusCode)")
+            }
 
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    self.showAlert(title: "Error", message: error.localizedDescription)
-                    return
-                }
-                
-                if let httpResponse = response as? HTTPURLResponse {
-                    print("📡 HTTP Response Status Code: \(httpResponse.statusCode)")
-                }
-                
-                guard let data = data else {
-                    self.showAlert(title: "Error", message: "No data received.")
-                    return
-                }
-                
-                do {
-                    let slotDetails = try JSONDecoder().decode(Slot.self, from: data)
-                    self.slot = slotDetails
-                    print("✅ Route fetched: \(slotDetails)")
+            print("📩 Slot API Response: \(String(data: data, encoding: .utf8) ?? "Invalid Data")")
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategy = .formatted(Slot.dateFormatter) 
+//                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let slot = try decoder.decode(Slot.self, from: data)
+
+                DispatchQueue.main.async {
+                    self.slots.append(slot)
                     self.tableView.reloadData()
-                } catch {
-                    self.showAlert(title: "Error", message: "Не удалось проанализировать детали маршрута.")
-                    print("❌ Decoding error: \(error)")
                 }
+            } catch let DecodingError.keyNotFound(key, context) {
+                print("❌ Missing key: \(key.stringValue) in \(context.codingPath)")
+            } catch {
+                print("❌ JSON Decoding Error: \(error)")
             }
-        }
-        task.resume()
+        }.resume()
     }
 
-    func showAlert(title: String, message: String) {
+    private func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
-    
+
+    private func findSlot(for ticket: Ticket) -> Slot? {
+        return slots.first { $0.id == ticket.route_id }
+    }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (ticket != nil && slot != nil) ? 1 : 0
+        return tickets.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "PaymentCell", for: indexPath) as! PaymentConfirmationCell
-        if let ticket = ticket, let slot = slot {
-            cell.configure(with: ticket, slot: slot)
-            if let qrCodeBase64 = qrCodeBase64 {
-                cell.loadQRCode(from: qrCodeBase64)
-            }
-        }
+        let cell = tableView.dequeueReusableCell(withIdentifier: "PaymentConfirmationCell", for: indexPath) as! PaymentConfirmationCell
+        let ticket = tickets[indexPath.row]
+        
+        let slotForTicket = findSlot(for: ticket)
+
+        cell.configure(with: ticket, slot: slotForTicket)
+
         return cell
     }
 }

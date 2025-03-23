@@ -1,10 +1,3 @@
-//
-//  TableViewCell.swift
-//  AulWay
-//
-//  Created by Aruzhan Kaharmanova on 13.03.2025.
-//
-
 import UIKit
 
 class PaymentConfirmationCell: UITableViewCell {
@@ -15,39 +8,46 @@ class PaymentConfirmationCell: UITableViewCell {
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var routeLabel: UILabel!
 
-    func configure(with ticket: Ticket, slot: Slot) {
-        routeLabel.text = "\(slot.departure) → \(slot.destination)"
-        dateLabel.text = formattedDate(slot.start_date)
-        departureTimeLabel.text = formattedTime(slot.start_date)
-        arrivalTimeLabel.text = formattedTime(slot.end_date)
-        busNumberLabel.text = slot.carNumber ?? "N/A"
+    override func awakeFromNib() {
+        super.awakeFromNib()
     }
 
-    func loadQRCode(from urlString: String) {
-       guard let url = URL(string: urlString) else {
-           print("❌ Invalid QR code URL")
-           return
-       }
-       fetchQRCode(from: url)
+    func configure(with ticket: Ticket, slot: Slot?) {
+        print("📩 Slot Data: \(String(describing: slot))")
+
+        if let slot = slot {
+            routeLabel.text = "\(slot.departure) → \(slot.destination)"
+            dateLabel.text = formattedDate(slot.start_date)
+            departureTimeLabel.text = formattedTime(slot.start_date)
+            arrivalTimeLabel.text = formattedTime(slot.end_date)
+            busNumberLabel.text = slot.carNumber?.isEmpty == false ? slot.carNumber : "Не указан"
+        } else {
+            routeLabel.text = "Маршрут не найден"
+            dateLabel.text = "Дата не указана"
+            departureTimeLabel.text = "—"
+            arrivalTimeLabel.text = "—"
+            busNumberLabel.text = "Не указан"
+        }
+
+
+        if !ticket.qr_code.isEmpty {
+            DispatchQueue.global(qos: .userInitiated).async {
+                if let imageData = Data(base64Encoded: ticket.qr_code, options: .ignoreUnknownCharacters),
+                   let image = UIImage(data: imageData) {
+                    DispatchQueue.main.async {
+                        self.qrImage.image = image
+                    }
+                } else {
+                    print("❌ Не удалось декодировать QR код из Base64")
+                }
+            }
+        } else {
+            qrImage.image = nil
+        }
+
     }
 
-    private func fetchQRCode(from url: URL) {
-       let task = URLSession.shared.dataTask(with: url) { data, response, error in
-           DispatchQueue.main.async {
-               if let error = error {
-                   print("❌ Error loading QR code: \(error.localizedDescription)")
-                   return
-               }
-               if let data = data, let image = UIImage(data: data) {
-                   self.qrImage.image = image
-               } else {
-                   print("❌ Failed to convert data into image")
-               }
-           }
-       }
-       task.resume()
-    }
-    
+
     private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd MMM yyyy"
@@ -59,4 +59,5 @@ class PaymentConfirmationCell: UITableViewCell {
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: date)
     }
+
 }

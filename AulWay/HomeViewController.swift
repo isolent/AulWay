@@ -138,7 +138,7 @@ class HomeViewController: UIViewController {
 
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                    print("✅ Response:", jsonResponse)
+//                    print("✅ Response:", jsonResponse)
                     self.performSegue(withIdentifier: "toLoading", sender: self)
                 } catch {
                     self.showAlert(message: "JSON Parsing Error: \(error.localizedDescription)")

@@ -31,21 +31,10 @@ class TicketListTableViewCell: UITableViewCell {
         self.contentView.layer.borderColor = #colorLiteral(red: 0.7843137255, green: 0.7843137255, blue: 0.7843137255, alpha: 1)
     }
     
-//    func configure(with ticket: Ticket) {
-//        let slot = ticket.slot
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "HH:mm" 
-//
-//        print("Start Date: \(slot.start_date), End Date: \(slot.end_date)") // Debug
-//
-////        self.route.text = "\(slot.departure) → \(slot.destination)"
-//        self.duration.text = "\(dateFormatter.string(from: slot.start_date)) - \(dateFormatter.string(from: slot.end_date))"
-//        self.price.text = "\(slot.price) ₸"
-//    }
     func configure(with ticket: Ticket) {
         let slot = ticket.slot
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "HH:mm" // 24-hour format
+        dateFormatter.dateFormat = "HH:mm" 
 
         let timeString = "\(dateFormatter.string(from: slot.start_date)) - \(dateFormatter.string(from: slot.end_date))"
 

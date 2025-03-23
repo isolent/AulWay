@@ -18,7 +18,7 @@ class RouteDetailsViewController: UIViewController {
     @IBOutlet weak var startTime: UILabel!
     @IBOutlet weak var endTime: UILabel!
     @IBOutlet weak var routeDuration: UILabel!
-
+    @IBOutlet weak var busNumberLabel: UILabel!
     @IBOutlet var departureLabels: [UILabel]!
     @IBOutlet var destinationLabels: [UILabel]!
     
@@ -32,7 +32,7 @@ class RouteDetailsViewController: UIViewController {
         super.viewDidLoad()
 
         if let slot = selectedSlot {
-            availableSeatNumber.text = "\(slot.availableSeats)"
+            availableSeatNumber.text = "\(slot.available_seats)"
             priceLabel.text = "\(slot.price) ₸"
 
             let timeFormatter = DateFormatter()
@@ -48,6 +48,15 @@ class RouteDetailsViewController: UIViewController {
             let hours = Int(duration) / 3600
             let minutes = (Int(duration) % 3600) / 60
             routeDuration.text = "\(hours)h \(minutes)m"
+            
+            if let busNumber = slot.carNumber {
+                print("Bus number:", busNumber) 
+                busNumberLabel.text = !busNumber.isEmpty ? busNumber : "Не указан"
+            } else {
+                print("Bus number is nil")
+                busNumberLabel.text = "Не указан"
+            }
+
         }
 
         departureLabels.forEach { $0.text = fromLocation }
@@ -74,9 +83,17 @@ class RouteDetailsViewController: UIViewController {
         if let paymentVC = storyboard.instantiateViewController(withIdentifier: "PaymentProcessViewController") as? PaymentProcessViewController {
             paymentVC.modalPresentationStyle = .automatic
             paymentVC.modalTransitionStyle = .coverVertical
+            
+            guard let slot = selectedSlot else {
+                print("❌ Ошибка: selectedSlot равен nil")
+                return
+            }
+            
             paymentVC.passengerCount = passengerCount
-            paymentVC.id = selectedSlot?.id ?? ""
+            paymentVC.id = slot.id 
             present(paymentVC, animated: true, completion: nil)
+            
+            print("✅ Передан ID: \(slot.id)")
         }
     }
 }
