@@ -1891,7 +1891,7 @@ We’re always here to help. Safe travels with AulWay! 🚍
                                             <color key="baseBackgroundColor" red="0.85098039219999999" green="0.85098039219999999" blue="0.85098039219999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </buttonConfiguration>
                                         <connections>
-                                            <action selector="yesButtonTapped:" destination="B6A-hd-4Ei" eventType="touchUpInside" id="OTF-Gp-Yef"/>
+                                            <action selector="deleteAccountTapped:" destination="B6A-hd-4Ei" eventType="touchUpInside" id="UfP-M0-542"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Jq-QT-NNX">
@@ -1906,7 +1906,7 @@ We’re always here to help. Safe travels with AulWay! 🚍
                                             <color key="baseBackgroundColor" red="0.85098039219999999" green="0.85098039219999999" blue="0.85098039219999999" alpha="0.40092094369999998" colorSpace="custom" customColorSpace="sRGB"/>
                                         </buttonConfiguration>
                                         <connections>
-                                            <action selector="keepAccountButtonTapped:" destination="B6A-hd-4Ei" eventType="touchUpInside" id="iKr-6t-7hK"/>
+                                            <action selector="cancelTapped:" destination="B6A-hd-4Ei" eventType="touchUpInside" id="fG0-Op-xjr"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -1940,10 +1940,6 @@ We’re always here to help. Safe travels with AulWay! 🚍
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="fbO-HV-ote"/>
-                    <connections>
-                        <outlet property="keepAccountButton" destination="9Jq-QT-NNX" id="WWX-MY-2vP"/>
-                        <outlet property="yesButton" destination="VQz-xJ-4h2" id="WWA-40-4V1"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cuV-xR-OMG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
