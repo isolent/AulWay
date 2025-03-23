@@ -21,6 +21,7 @@ class SignInViewController: UIViewController {
         configureTextField(emailTextField)
         configureTextField(passwordTextField)
         configureButton(signInButton)
+        passwordTextField.isSecureTextEntry = true
     }
     
     @IBAction func signInTapped(_ sender: UIButton) {
@@ -101,7 +102,7 @@ class SignInViewController: UIViewController {
                     print("👤 First Name: \(firstName), Last Name: \(lastName)")
                     print("📧 Email: \(email), 📱 Phone: \(phone)")
                     
-                    self.saveUserSession(accessToken: accessToken, userId: userId)
+                    self.saveUserSession(accessToken: accessToken, userId: userId, email: email)
                     
                     UserDefaults.standard.set(userId, forKey: "id")
                     UserDefaults.standard.set(accessToken, forKey: "authToken")
@@ -134,10 +135,11 @@ class SignInViewController: UIViewController {
     }
     
     
-    private func saveUserSession(accessToken: String, userId: String) {
+    private func saveUserSession(accessToken: String, userId: String, email: String) {
         let defaults = UserDefaults.standard
         defaults.setValue(accessToken, forKey: "access_token")
         defaults.setValue(userId, forKey: "user_id")
+        defaults.setValue(email, forKey: "email")
     }
     
     private func navigateToHome() {

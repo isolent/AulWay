@@ -72,12 +72,12 @@ class VerifyViewController: UIViewController {
                        let user = json["user"] as? [String: Any],
                        let userId = user["id"] as? String {
 
+                        UserDefaults.standard.setValue(self.email, forKey: "email")
                         UserDefaults.standard.setValue(userId, forKey: "user_id")
-                        print("✅ Saved user_id:", userId)
 
                         if let token = json["access_token"] as? String {
                             UserDefaults.standard.setValue(token, forKey: "access_token")
-                            print("🔐 Saved access_token:", token.prefix(16) + "...")
+//                            print("🔐 Saved access_token:", token.prefix(16) + "...")
                         }
                     }
                 } catch {

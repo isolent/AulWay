@@ -1545,8 +1545,17 @@
                                     <constraint firstItem="b0d-EC-8WC" firstAttribute="centerX" secondItem="Q4f-Zg-Y1v" secondAttribute="centerX" id="vM5-YK-vJ0"/>
                                 </constraints>
                             </stackView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tO5-6H-Izj">
+                                <rect key="frame" x="35" y="384.33333333333331" width="143.66666666666666" height="34.333333333333314"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Show password"/>
+                                <connections>
+                                    <action selector="togglePasswordVisibilityTapped:" destination="iQm-XW-6eM" eventType="touchUpInside" id="M5C-m7-Xig"/>
+                                </connections>
+                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nnf-9n-rpG">
-                                <rect key="frame" x="140" y="384.33333333333331" width="113" height="50"/>
+                                <rect key="frame" x="142" y="428.66666666666669" width="109.33333333333331" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="IFs-Kg-1kf"/>
                                 </constraints>
@@ -1556,19 +1565,23 @@
                                     <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <color key="baseBackgroundColor" red="0.49803921579999999" green="0.51372551919999998" blue="0.49411764740000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </buttonConfiguration>
+                                <connections>
+                                    <action selector="saveButtonTapped:" destination="iQm-XW-6eM" eventType="touchUpInside" id="e9q-eu-hoT"/>
+                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="CF5-0o-nxG"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="CF5-0o-nxG" firstAttribute="trailing" secondItem="Nnf-9n-rpG" secondAttribute="trailing" constant="140" id="D6m-FZ-GAA"/>
                             <constraint firstItem="CF5-0o-nxG" firstAttribute="trailing" secondItem="Q4f-Zg-Y1v" secondAttribute="trailing" constant="42" id="Dxs-vm-EAc"/>
                             <constraint firstItem="Q4f-Zg-Y1v" firstAttribute="leading" secondItem="CF5-0o-nxG" secondAttribute="leading" constant="42" id="F1V-pS-K3s"/>
-                            <constraint firstItem="Nnf-9n-rpG" firstAttribute="leading" secondItem="CF5-0o-nxG" secondAttribute="leading" constant="140" id="IjN-2o-7QQ"/>
-                            <constraint firstItem="Nnf-9n-rpG" firstAttribute="top" secondItem="Q4f-Zg-Y1v" secondAttribute="bottom" constant="20" id="Vxf-VQ-LaT"/>
+                            <constraint firstItem="tO5-6H-Izj" firstAttribute="leading" secondItem="CF5-0o-nxG" secondAttribute="leading" constant="35" id="Hnq-HQ-9UL"/>
+                            <constraint firstItem="Nnf-9n-rpG" firstAttribute="leading" secondItem="CF5-0o-nxG" secondAttribute="leading" constant="142" id="MDW-OS-CmK"/>
                             <constraint firstItem="98u-zV-QpR" firstAttribute="centerY" secondItem="gR8-I1-lF5" secondAttribute="centerY" id="aCo-7j-HP4"/>
                             <constraint firstItem="98u-zV-QpR" firstAttribute="leading" secondItem="gR8-I1-lF5" secondAttribute="leadingMargin" constant="-20.666666666666657" id="fCm-8k-DH0"/>
                             <constraint firstItem="Q4f-Zg-Y1v" firstAttribute="top" secondItem="HMl-r1-hIi" secondAttribute="bottom" constant="40" id="gej-Jg-4Tr"/>
+                            <constraint firstItem="tO5-6H-Izj" firstAttribute="top" secondItem="Q4f-Zg-Y1v" secondAttribute="bottom" constant="20" id="j4X-xf-JHz"/>
+                            <constraint firstItem="Nnf-9n-rpG" firstAttribute="top" secondItem="tO5-6H-Izj" secondAttribute="bottom" constant="10" id="jpy-8Z-144"/>
                             <constraint firstItem="HMl-r1-hIi" firstAttribute="top" secondItem="CF5-0o-nxG" secondAttribute="top" constant="20" id="ls2-g8-EQd"/>
                             <constraint firstItem="HMl-r1-hIi" firstAttribute="leading" secondItem="CF5-0o-nxG" secondAttribute="leading" constant="30" id="nx9-zd-c35"/>
                             <constraint firstItem="98u-zV-QpR" firstAttribute="centerX" secondItem="gR8-I1-lF5" secondAttribute="centerX" id="osa-kV-hDr"/>
@@ -1581,11 +1594,12 @@
                         <outlet property="currentPasswordTextField" destination="GQ2-rA-3gK" id="3PK-gj-egU"/>
                         <outlet property="newPasswordTextField" destination="G5a-Ce-3Uo" id="LQw-Q6-iH9"/>
                         <outlet property="saveButton" destination="Nnf-9n-rpG" id="hyO-Rp-p8H"/>
+                        <outlet property="togglePasswordVisibilityButton" destination="tO5-6H-Izj" id="QQ5-hq-Cit"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QlL-ci-sLP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1273" y="246"/>
+            <point key="canvasLocation" x="1272.5190839694656" y="245.77464788732397"/>
         </scene>
         <!--About Us View Controller-->
         <scene sceneID="dyS-yb-tV0">
