@@ -13,6 +13,10 @@ class EditProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadUserData()
+        configureTextField(firstNameTextField)
+        configureTextField(lastNameTextField)
+        configureTextField(emailTextField)
+        configureTextField(phoneNumberTextField)
     }
 
     @IBAction func saveButtonTapped(_ sender: UIButton) {
@@ -150,16 +154,28 @@ class EditProfileViewController: UIViewController {
             return
         }
 
-        let firstName = defaults.string(forKey: "firstname") ?? ""
-        let lastName = defaults.string(forKey: "lastname") ?? ""
-        let email = defaults.string(forKey: "email") ?? ""
-        let phone = defaults.string(forKey: "phone") ?? ""
+        let firstName = defaults.string(forKey: "firstname")
+        let lastName = defaults.string(forKey: "lastname")
+        let email = defaults.string(forKey: "email")
+        let phone = defaults.string(forKey: "phone")
 
-        firstNameTextField.text = firstName
-        lastNameTextField.text = lastName
-        emailTextField.text = email
-        phoneNumberTextField.text = phone
+        if let firstName = firstName, !firstName.isEmpty {
+            firstNameTextField.text = firstName
+        }
+
+        if let lastName = lastName, !lastName.isEmpty {
+            lastNameTextField.text = lastName
+        }
+
+        if let email = email, !email.isEmpty {
+            emailTextField.text = email
+        }
+
+        if let phone = phone, !phone.isEmpty {
+            phoneNumberTextField.text = phone
+        }
     }
+
 
     private func clearUserDefaultsForProfile() {
         let defaults = UserDefaults.standard
@@ -168,5 +184,12 @@ class EditProfileViewController: UIViewController {
         defaults.removeObject(forKey: "email")
         defaults.removeObject(forKey: "phone")
         defaults.synchronize()
+    }
+    
+    private func configureTextField(_ textField: UITextField) {
+        textField.layer.borderWidth = 1.0
+        textField.layer.borderColor = UIColor.lightGray.cgColor
+        textField.layer.cornerRadius = textField.frame.height / 2
+        textField.clipsToBounds = true
     }
 }

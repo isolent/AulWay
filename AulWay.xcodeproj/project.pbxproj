@@ -59,17 +59,29 @@
 		13D45F852D0CDBA40000D07F /* Exceptions for "AulWay" folder in "AulWay" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				.swift,
 				Info.plist,
 			);
 			target = 13D45F5C2D0CDBA10000D07F /* AulWay */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		13D192D82D9086160020B98A /* Exceptions for "AulWay" folder in "Compile Sources" phase from "AulWay" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 13D45F592D0CDBA10000D07F /* Sources */;
+			membershipExceptions = (
+				.swift,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		13D45F5F2D0CDBA10000D07F /* AulWay */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				13D45F852D0CDBA40000D07F /* Exceptions for "AulWay" folder in "AulWay" target */,
+				13D192D82D9086160020B98A /* Exceptions for "AulWay" folder in "Compile Sources" phase from "AulWay" target */,
 			);
 			path = AulWay;
 			sourceTree = "<group>";
