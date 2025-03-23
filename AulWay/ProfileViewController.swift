@@ -65,17 +65,21 @@ class ProfileViewController: UIViewController {
                 return
             }
 
-        
-//            print("📩 Server Response:", String(data: data, encoding: .utf8) ?? "Invalid data")
-
             do {
                 if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                     DispatchQueue.main.async {
-                        let firstName = jsonResponse["first_name"] as? String ?? "N/A"
-                        let lastName = jsonResponse["last_name"] as? String ?? "N/A"
+                        let firstName = jsonResponse["first_name"] as? String ?? ""
+                        let lastName = jsonResponse["last_name"] as? String ?? ""
+                        let phone = jsonResponse["phone"] as? String ?? ""
+                        let email = jsonResponse["email"] as? String ?? "N/A"
+
                         self.nameLabel.text = "\(firstName) \(lastName)"
-                        self.emailLabel.text = jsonResponse["email"] as? String ?? "N/A"
-                        self.phoneLabel.text = jsonResponse["phone"] as? String ?? "N/A"
+                        self.emailLabel.text = email
+                        self.phoneLabel.text = phone
+
+                        if firstName.isEmpty && lastName.isEmpty && phone.isEmpty {
+                            self.presentEditProfileAlert()
+                        }
                     }
                 }
             } catch {
@@ -84,6 +88,25 @@ class ProfileViewController: UIViewController {
         }
         task.resume()
     }
+
+    
+    private func presentEditProfileAlert() {
+        let alert = UIAlertController(
+            title: "Профиль неполный",
+            message: "Пожалуйста, укажите имя, фамилию и номер телефона.",
+            preferredStyle: .alert
+        )
+
+//        alert.addAction(UIAlertAction(title: "Ок", style: .cancel, handler: nil))
+
+        alert.addAction(UIAlertAction(title: "Редактировать", style: .default, handler: { _ in
+            self.editProfileTapped()
+        }))
+
+        present(alert, animated: true, completion: nil)
+    }
+
+
     
     @IBAction func logOutButtonTapped(_ sender: Any) {
         let alert = UIAlertController(title: "Выйти", message: "Вы уверены, что хотите выйти из системы?", preferredStyle: .alert)

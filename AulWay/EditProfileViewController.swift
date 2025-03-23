@@ -13,57 +13,10 @@ class EditProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadUserData()
-        fetchUserProfile()
     }
 
     @IBAction func saveButtonTapped(_ sender: UIButton) {
         updateUserProfile()
-    }
-
-    private func fetchUserProfile() {
-        guard let userId = UserDefaults.standard.string(forKey: "id"),
-              let token = UserDefaults.standard.string(forKey: "authToken") else {
-//            print("⚠️ No user data found, skipping fetch.")
-            return
-        }
-
-        let urlString = "http://localhost:8080/api/users/\(userId)"
-        guard let url = URL(string: urlString) else { return }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    self.showAlert(title: "Ошибка", message: "Ошибка выборки: \(error.localizedDescription)")
-                    return
-                }
-
-                guard let httpResponse = response as? HTTPURLResponse, let data = data, httpResponse.statusCode == 200 else {
-                    self.showAlert(title: "Ошибка", message: "Не удалось получить профиль. Статус: \((response as? HTTPURLResponse)?.statusCode ?? 0)")
-                    return
-                }
-
-                do {
-                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                        let firstName = json["first_name"] as? String ?? ""
-                        let lastName = json["last_name"] as? String ?? ""
-                        let email = json["email"] as? String ?? ""
-                        let phone = json["phone"] as? String ?? ""
-
-                        self.firstNameTextField.text = firstName
-                        self.lastNameTextField.text = lastName
-                        self.emailTextField.text = email
-                        self.phoneNumberTextField.text = phone
-                    }
-                } catch {
-                    self.showAlert(title: "Ошибка", message: "Не удалось проанализировать данные профиля: \(error)")
-                }
-            }
-        }
-        task.resume()
     }
 
     private func updateUserProfile() {
@@ -75,9 +28,9 @@ class EditProfileViewController: UIViewController {
             return
         }
 
-        guard let userId = UserDefaults.standard.string(forKey: "id"),
-              let token = UserDefaults.standard.string(forKey: "authToken") else {
-            showAlert(title: "Ошибка", message: "Срок действия пользовательской сессии истек. Пожалуйста, войдите в систему еще раз.")
+        guard let userId = UserDefaults.standard.string(forKey: "user_id") else {
+            print("⚠️ No user ID found")
+            showAlert(title: "Ошибка", message: "Пользователь не найден. Пожалуйста, зарегистрируйтесь заново.")
             return
         }
 
@@ -87,20 +40,28 @@ class EditProfileViewController: UIViewController {
             return
         }
 
+        guard let authToken = UserDefaults.standard.string(forKey: "access_token") else {
+            showAlert(title: "Ошибка", message: "Отсутствует токен авторизации")
+            return
+        }
+        
         let parameters: [String: Any] = [
-            "first_name": firstName,
-            "last_name": lastName,
+            "firstname": firstName,
+            "lastname": lastName,
             "email": email,
             "phone": phoneNumber
         ]
 
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
+        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
+            if let jsonString = String(data: request.httpBody ?? Data(), encoding: .utf8) {
+                print("\n📤 PUT Body JSON:\n\(jsonString)\n")
+            }
         } catch {
             showAlert(title: "Ошибка", message: "Не удалось закодировать данные.")
             return
@@ -118,13 +79,24 @@ class EditProfileViewController: UIViewController {
                     return
                 }
 
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("\n📥 Server Response (\(httpResponse.statusCode)):\n\(responseString)\n")
+                }
+
                 switch httpResponse.statusCode {
                 case 200...299:
                     self.handleSuccessfulUpdate(with: data)
-                case 401:
-                    self.showAlert(title: "Ошибка", message: "Сеанс истек. Пожалуйста, войдите в систему еще раз.")
                 default:
-                    self.showAlert(title: "Ошибка", message: "Ошибка сервера. Код состояния: \(httpResponse.statusCode)")
+                    var message = "Ошибка сервера. Код состояния: \(httpResponse.statusCode)"
+                    if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                       let serverMessage = json["errDesc"] as? String {
+                        if serverMessage.contains("duplicate key value") {
+                            message = "Этот email уже используется. Попробуйте другой."
+                        } else {
+                            message = serverMessage
+                        }
+                    }
+                    self.showAlert(title: "Ошибка", message: message)
                 }
             }
         }
@@ -134,8 +106,8 @@ class EditProfileViewController: UIViewController {
     private func handleSuccessfulUpdate(with data: Data) {
         do {
             if let updatedUser = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                firstNameTextField.text = updatedUser["first_name"] as? String ?? ""
-                lastNameTextField.text = updatedUser["last_name"] as? String ?? ""
+                firstNameTextField.text = updatedUser["firstname"] as? String ?? ""
+                lastNameTextField.text = updatedUser["lastname"] as? String ?? ""
                 emailTextField.text = updatedUser["email"] as? String ?? ""
                 phoneNumberTextField.text = updatedUser["phone"] as? String ?? ""
 
@@ -171,10 +143,9 @@ class EditProfileViewController: UIViewController {
     private func loadUserData() {
         let defaults = UserDefaults.standard
 
-        // Check for new user flag, if it exists, clear defaults and return
         if defaults.bool(forKey: "isNewUser") {
             clearUserDefaultsForProfile()
-            defaults.set(false, forKey: "isNewUser") // Reset the flag
+            defaults.set(false, forKey: "isNewUser")
             defaults.synchronize()
             return
         }
