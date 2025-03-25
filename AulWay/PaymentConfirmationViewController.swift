@@ -15,9 +15,9 @@ class PaymentConfirmationViewController: UIViewController, UITableViewDelegate, 
         let button = UIButton(type: .system)
         button.setTitle("Перейти к моим билетам", for: .normal)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor(red: 0.62, green: 0.65, blue: 0.60, alpha: 1.0) // Greenish from screenshot
-        button.layer.cornerRadius = 20
+        button.backgroundColor = UIColor(red: 0.518, green: 0.553, blue: 0.478, alpha: 1.0)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        button.layer.cornerRadius = 25
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -147,10 +147,21 @@ class PaymentConfirmationViewController: UIViewController, UITableViewDelegate, 
     }
     
     @objc private func goToTicketsTapped() {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        if let userTicketsVC = storyboard.instantiateViewController(withIdentifier: "UserTicketsViewController") as? UserTicketsViewController {
-            navigationController?.pushViewController(userTicketsVC, animated: true)
+        var currentVC: UIViewController? = self
+
+        // Проходим по стеку presentingViewController, чтобы дойти до UITabBarController
+        while let presenting = currentVC?.presentingViewController {
+            if let tabBarController = presenting as? UITabBarController {
+                tabBarController.selectedIndex = 1 // вкладка "Tickets"
+                // Закрываем все модальные экраны
+                presenting.dismiss(animated: true)
+                print("✅ Успешно перешли к вкладке билетов")
+                return
+            }
+            currentVC = presenting
         }
+
+        print("❌ Не удалось найти UITabBarController в стеке presentingViewController")
     }
 
 }

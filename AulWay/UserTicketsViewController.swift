@@ -7,7 +7,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
         case upcoming
     }
 
-    var currentTicketType: TicketType = .past
+    var currentTicketType: TicketType = .upcoming
     var pastTickets: [Ticket] = []
     var upcomingTickets: [Ticket] = []
 
@@ -25,7 +25,6 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        print("🔄 UserTicketsViewController appeared — обновляем билеты")
         fetchTickets()
     }
 
@@ -38,7 +37,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TicketsTableViewCell", for: indexPath) as! TicketsTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TicketsTableViewCell", for: indexPath) as! UserTicketsTableViewCell
 
         let ticket = currentTicketType == .past ? pastTickets[indexPath.row] : upcomingTickets[indexPath.row]
 
@@ -54,7 +53,8 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
         cell.Time.text = "\(timeFormatter.string(from: ticket.slot.start_date)) - \(timeFormatter.string(from: ticket.slot.end_date))"
 
         cell.Path.text = "\(ticket.slot.departure) - \(ticket.slot.destination)"
-        cell.Status.text = ticket.paid ? "Paid" : "Unpaid"
+//        cell.Status.text = ticket.paid ? "Paid" : "Unpaid"
+        cell.Status.text = "Paid"
         cell.CarNumber.text = ticket.slot.carNumber ?? "-"
 
         return cell
@@ -149,22 +149,47 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
             }
 
             do {
-                var tickets = try JSONDecoder().decode([Ticket].self, from: data)
+                var fetchedTickets = try JSONDecoder().decode([Ticket].self, from: data)
                 let group = DispatchGroup()
 
-                for i in 0..<tickets.count {
-                    if tickets[i].slot.departure == "Unknown" {
+                for i in 0..<fetchedTickets.count {
+                    if fetchedTickets[i].slot.departure == "Unknown" {
                         group.enter()
-                        self.fetchSlot(for: tickets[i].route_id ?? "", token: token) { slot in
-                            tickets[i].slot = slot ?? Slot.defaultSlot()
+                        self.fetchSlot(for: fetchedTickets[i].route_id ?? "", token: token) { slot in
+                            fetchedTickets[i].slot = slot ?? Slot.defaultSlot()
                             group.leave()
                         }
                     }
                 }
 
                 group.notify(queue: .main) {
-                    print("✅ \(type.capitalized) билеты успешно загружены: \(tickets.count)")
-                    completion(tickets)
+                    print("✅ \(type.capitalized) билеты успешно загружены: \(fetchedTickets.count)")
+
+//                    for newTicket in fetchedTickets {
+//                        switch type {
+//                        case "past":
+//                            if let index = self.pastTickets.firstIndex(where: { $0.id == newTicket.id }) {
+//                                self.pastTickets[index] = newTicket
+//                            } else {
+//                                self.pastTickets.append(newTicket)
+//                            }
+//                        case "upcoming":
+//                            if let index = self.upcomingTickets.firstIndex(where: { $0.id == newTicket.id }) {
+//                                self.upcomingTickets[index] = newTicket
+//                            } else {
+//                                self.upcomingTickets.append(newTicket)
+//                            }
+//                        default:
+//                            break
+//                        }
+//                    }
+
+                    if (type == "past" && self.currentTicketType == .past) ||
+                       (type == "upcoming" && self.currentTicketType == .upcoming) {
+                        self.tickets.reloadData()
+                    }
+
+                    completion(fetchedTickets)
                 }
             } catch {
                 print("❌ Ошибка парсинга \(type) билетов: \(error)")
@@ -172,6 +197,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
             }
         }.resume()
     }
+
 
     private func fetchSlot(for routeId: String, token: String, completion: @escaping (Slot?) -> Void) {
         let urlString = "http://localhost:8080/api/routes/\(routeId)"
