@@ -11,6 +11,18 @@ class PaymentConfirmationViewController: UIViewController, UITableViewDelegate, 
     
     @IBOutlet weak var tableView: UITableView!
     
+    private let goToTicketsButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Перейти к моим билетам", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = UIColor(red: 0.62, green: 0.65, blue: 0.60, alpha: 1.0) // Greenish from screenshot
+        button.layer.cornerRadius = 20
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+
+    
     var tickets: [Ticket] = []
     var slots: [Slot] = []
     var passengerCount: Int = 1
@@ -20,13 +32,24 @@ class PaymentConfirmationViewController: UIViewController, UITableViewDelegate, 
         setupTableView()
         fetchPassengerCount()
         loadTicketDetails()
+
+        view.addSubview(goToTicketsButton)
+        goToTicketsButton.addTarget(self, action: #selector(goToTicketsTapped), for: .touchUpInside)
+
+        NSLayoutConstraint.activate([
+            goToTicketsButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            goToTicketsButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+            goToTicketsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
+            goToTicketsButton.heightAnchor.constraint(equalToConstant: 50)
+        ])
     }
+
 
     private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
     }
-
+        
     private func fetchPassengerCount() {
         if let homeVC = presentingViewController as? HomeViewController {
             passengerCount = homeVC.passengerCount
@@ -84,7 +107,6 @@ class PaymentConfirmationViewController: UIViewController, UITableViewDelegate, 
             do {
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategy = .formatted(Slot.dateFormatter) 
-//                decoder.keyDecodingStrategy = .convertFromSnakeCase
                 let slot = try decoder.decode(Slot.self, from: data)
 
                 DispatchQueue.main.async {
@@ -123,4 +145,12 @@ class PaymentConfirmationViewController: UIViewController, UITableViewDelegate, 
 
         return cell
     }
+    
+    @objc private func goToTicketsTapped() {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        if let userTicketsVC = storyboard.instantiateViewController(withIdentifier: "UserTicketsViewController") as? UserTicketsViewController {
+            navigationController?.pushViewController(userTicketsVC, animated: true)
+        }
+    }
+
 }

@@ -49,11 +49,10 @@ class RouteDetailsViewController: UIViewController {
             let minutes = (Int(duration) % 3600) / 60
             routeDuration.text = "\(hours)h \(minutes)m"
             
-            if let busNumber = slot.carNumber {
-                print("Bus number:", busNumber) 
-                busNumberLabel.text = !busNumber.isEmpty ? busNumber : "Не указан"
+            if let busNumber = slot.carNumber, !busNumber.isEmpty {
+                busNumberLabel.text = busNumber
             } else {
-                print("Bus number is nil")
+                print("bus number is nil")
                 busNumberLabel.text = "Не указан"
             }
 

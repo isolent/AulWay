@@ -433,7 +433,7 @@
         <!--User Tickets View Controller-->
         <scene sceneID="1Hi-GS-6sq">
             <objects>
-                <viewController storyboardIdentifier="UserTicketsViewController" id="Vag-gC-LSz" customClass="UserTicketsViewController" customModule="AulWay" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="Vag-gC-LSz" customClass="UserTicketsViewController" customModule="AulWay" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8qs-yT-fyO">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -651,7 +651,7 @@
         <!--Tickets-->
         <scene sceneID="zFo-7K-pT5">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="LJa-tN-3Iv" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="UserTicketsViewController" automaticallyAdjustsScrollViewInsets="NO" id="LJa-tN-3Iv" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Tickets" image="ticket" catalog="system" id="Kpp-D8-oWy" userLabel="Билеты"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="eeM-ay-WFw">
@@ -1225,7 +1225,6 @@
         <!--Forgot Password View Controller-->
         <scene sceneID="bGL-8c-iOw">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="rXc-KE-kJe" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <viewController id="Dzf-k6-AYP" userLabel="Forgot Password View Controller" customClass="ForgotPasswordViewController" customModule="AulWay" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="MKg-CZ-1TO">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
@@ -1315,6 +1314,7 @@
                         <outlet property="submitButton" destination="6tI-Ju-6h3" id="vQp-rz-hk0"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rXc-KE-kJe" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-170" y="-2106"/>
         </scene>
@@ -1381,7 +1381,6 @@
                         <outlet property="busImageView" destination="aqP-Cf-WHG" id="3eF-MR-Odu"/>
                         <outlet property="progressView" destination="nCo-U1-fgd" id="8fN-Bl-TN1"/>
                         <segue destination="yGs-I6-aDC" kind="show" identifier="showTicketList" id="jje-2y-ZMX"/>
-                        <segue destination="oUd-89-mJq" kind="show" identifier="goToNFpage" id="uCd-Tc-EtN"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7xh-PQ-zeU" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -2141,7 +2140,7 @@ We’re always here to help. Safe travels with AulWay! 🚍
                                                     </imageView>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="505BES05" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iv9-4m-qQE">
                                                         <rect key="frame" x="0.0" y="39.999999999999972" width="86.333333333333329" height="24.666666666666671"/>
-                                                        <color key="backgroundColor" red="0.52549022440000004" green="0.55294120309999995" blue="0.48627454040000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <fontDescription key="fontDescription" name="AvenirNext-Medium" family="Avenir Next" pointSize="18"/>
                                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <nil key="highlightedColor"/>
@@ -2236,17 +2235,17 @@ We’re always here to help. Safe travels with AulWay! 🚍
                                             </stackView>
                                         </subviews>
                                     </stackView>
-                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="30" translatesAutoresizingMaskIntoConstraints="NO" id="cEO-IK-sAW">
-                                        <rect key="frame" x="42.666666666666657" y="292" width="307.66666666666674" height="23.333333333333314"/>
+                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="120" translatesAutoresizingMaskIntoConstraints="NO" id="cEO-IK-sAW">
+                                        <rect key="frame" x="44" y="292" width="305.33333333333331" height="23.333333333333314"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Длительность маршрута:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tQz-uh-cU5">
-                                                <rect key="frame" x="0.0" y="0.0" width="204.66666666666666" height="23.333333333333332"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Время в пути:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tQz-uh-cU5">
+                                                <rect key="frame" x="0.0" y="0.0" width="112.33333333333333" height="23.333333333333332"/>
                                                 <fontDescription key="fontDescription" name="AvenirNext-Medium" family="Avenir Next" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3h 50min" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fBH-8K-Kh0">
-                                                <rect key="frame" x="234.66666666666663" y="0.0" width="73" height="23.333333333333332"/>
+                                                <rect key="frame" x="232.33333333333331" y="0.0" width="73" height="23.333333333333332"/>
                                                 <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -2307,19 +2306,19 @@ We’re always here to help. Safe travels with AulWay! 🚍
                                 <rect key="frame" x="-9" y="-5" width="402" height="879"/>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Qordai - Otar" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wfA-p5-JjV">
-                                <rect key="frame" x="120.66666666666667" y="108" width="151.66666666666663" height="33"/>
+                                <rect key="frame" x="120.66666666666667" y="64" width="151.66666666666663" height="33"/>
                                 <fontDescription key="fontDescription" name="Avenir-Heavy" family="Avenir" pointSize="24"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="7 Jan, 1 passenger" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="F2Y-mP-zuL">
-                                <rect key="frame" x="128" y="144" width="137" height="22"/>
+                                <rect key="frame" x="128" y="100" width="137" height="22"/>
                                 <fontDescription key="fontDescription" name="AvenirNext-Medium" family="Avenir Next" pointSize="16"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="magnifyingglass" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="gYM-7D-yFW">
-                                <rect key="frame" x="121.66666666666669" y="367" width="150" height="148.33333333333326"/>
+                                <rect key="frame" x="121.66666666666669" y="323" width="150" height="148.33333333333331"/>
                                 <color key="tintColor" systemColor="systemGray6Color"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="150" id="FFX-Hm-yQk"/>
@@ -2327,13 +2326,13 @@ We’re always here to help. Safe travels with AulWay! 🚍
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Результаты не найдены" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XCY-Xs-cW1">
-                                <rect key="frame" x="29" y="546" width="335" height="41"/>
+                                <rect key="frame" x="29" y="502" width="335" height="41"/>
                                 <fontDescription key="fontDescription" name="AvenirNext-Medium" family="Avenir Next" pointSize="30"/>
                                 <color key="textColor" systemColor="systemGray5Color"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Не найдено никаких результатов по этому маршруту" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EcJ-lW-BGg">
-                                <rect key="frame" x="20" y="592" width="353" height="49.333333333333371"/>
+                                <rect key="frame" x="20" y="548" width="353" height="49.333333333333371"/>
                                 <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="18"/>
                                 <color key="textColor" systemColor="systemGray5Color"/>
                                 <nil key="highlightedColor"/>
@@ -2933,7 +2932,7 @@ We’re always here to help. Safe travels with AulWay! 🚍
                     <viewLayoutGuide key="safeArea" id="0Pd-7b-MLf"/>
                 </stackView>
             </objects>
-            <point key="canvasLocation" x="1273" y="1677"/>
+            <point key="canvasLocation" x="1272.5190839694656" y="1676.7605633802818"/>
         </scene>
         <!--Sign Up View Controller-->
         <scene sceneID="7bL-sQ-2MU">
