@@ -125,8 +125,19 @@ class TicketDetailsViewController: UIViewController {
         statusLabel.text = ticket.payment_status.capitalized
         qrImageView.backgroundColor = .white
 
-        if let qrImage = generateQRCode(from: ticket.qr_code) {
-            qrImageView.image = qrImage
+        if !ticket.qr_code.isEmpty {
+            DispatchQueue.global(qos: .userInitiated).async {
+                if let imageData = Data(base64Encoded: ticket.qr_code, options: .ignoreUnknownCharacters),
+                   let image = UIImage(data: imageData) {
+                    DispatchQueue.main.async {
+                        self.qrImageView.image = image
+                    }
+                } else {
+                    print("❌ Не удалось декодировать QR код из Base64")
+                }
+            }
+        } else {
+            qrImageView.image = nil
         }
     }
 
