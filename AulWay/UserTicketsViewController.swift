@@ -45,8 +45,12 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
         dateFormatter.dateFormat = "d MMM"
         cell.Date.text = dateFormatter.string(from: ticket.slot.start_date)
 
-        let duration = ticket.slot.end_date.timeIntervalSince(ticket.slot.start_date) / 3600
-        cell.Duration.text = String(format: "%.2f hours", duration)
+        let timeString = "\(dateFormatter.string(from: ticket.slot.start_date)) - \(dateFormatter.string(from: ticket.slot.end_date))"
+
+        let durationFormatter = DateComponentsFormatter()
+        durationFormatter.unitsStyle = .abbreviated
+        durationFormatter.allowedUnits = [.hour, .minute]
+        let duration = durationFormatter.string(from: ticket.slot.start_date, to: ticket.slot.end_date) ?? "N/A"
 
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "HH:mm"
@@ -61,8 +65,18 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tickets.deselectRow(at: indexPath, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
+
+        let ticket = currentTicketType == .past ? pastTickets[indexPath.row] : upcomingTickets[indexPath.row]
+
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        if let ticketDetailsVC = storyboard.instantiateViewController(withIdentifier: "TicketDetailsViewController") as? TicketDetailsViewController {
+            ticketDetailsVC.ticketId = ticket.id
+            ticketDetailsVC.userId = ticket.user_id
+            self.navigationController?.pushViewController(ticketDetailsVC, animated: true)
+        }
     }
+
 
     @IBAction func switchTicketType(_ sender: UIButton) {
         currentTicketType = sender == upcomingButton ? .upcoming : .past
@@ -163,7 +177,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
                 }
 
                 group.notify(queue: .main) {
-                    print("✅ \(type.capitalized) билеты успешно загружены: \(fetchedTickets.count)")
+//                    print("✅ \(type.capitalized) билеты успешно загружены: \(fetchedTickets.count)")
 
 //                    for newTicket in fetchedTickets {
 //                        switch type {
@@ -222,7 +236,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategy = .formatted(Slot.dateFormatter)
                 let slot = try decoder.decode(Slot.self, from: data)
-                print("📩 Slot для routeId \(routeId): \(slot.departure) - \(slot.destination)")
+//                print("📩 Slot для routeId \(routeId): \(slot.departure) - \(slot.destination)")
                 completion(slot)
             } catch {
                 print("❌ Ошибка декодирования слота: \(error)")
