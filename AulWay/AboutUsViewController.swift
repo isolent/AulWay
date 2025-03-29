@@ -6,72 +6,63 @@
 //
 
 import UIKit
+
 class AboutUsViewController: UIViewController {
-    
+
+    @IBOutlet weak var textLabel: UITextView!
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupUI()
+        fetchAboutUsContent()
+    }
+
+    private func setupUI() {
         textLabel.layer.cornerRadius = 20
         textLabel.clipsToBounds = true
+        textLabel.isEditable = false
+        textLabel.text = "Загрузка..."
     }
-    
-    @IBOutlet weak var textLabel: UITextView!
+
+    private func fetchAboutUsContent() {
+        guard let token = UserDefaults.standard.string(forKey: "access_token") else {
+            print("❌ Access token not found")
+            return
+        }
+
+        let urlString = "http://localhost:8080/api/pages/about_us"
+        guard let url = URL(string: urlString) else {
+            print("❌ Invalid URL")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("❌ Request failed: \(error.localizedDescription)")
+                return
+            }
+
+            guard let data = data else {
+                print("❌ No data received")
+                return
+            }
+
+            do {
+                let page = try JSONDecoder().decode(Page.self, from: data)
+                DispatchQueue.main.async {
+                    self.textLabel.text = page.content
+                }
+            } catch {
+                print("❌ Decoding failed: \(error)")
+                if let json = String(data: data, encoding: .utf8) {
+                    print("📩 Raw JSON response: \(json)")
+                }
+            }
+        }.resume()
+    }
 }
-//
-//class AboutUsViewController: UIViewController {
-//
-//    @IBOutlet weak var textLabel: UITextView!
-//
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        textLabel.layer.cornerRadius = 20
-//        textLabel.clipsToBounds = true
-//        fetchPageContent(title: "about_us")
-//    }
-//
-//    private func fetchPageContent(title: String) {
-//        guard let token = UserDefaults.standard.string(forKey: "access_token") else {
-//            print("❌ No access token found")
-//            textLabel.text = "Ошибка: отсутствует токен"
-//            return
-//        }
-//
-//        guard let url = URL(string: "http://localhost:8080/api/pages/\(title)") else {
-//            print("❌ Invalid URL")
-//            return
-//        }
-//
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "GET"
-//        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-//
-//        URLSession.shared.dataTask(with: request) { data, response, error in
-//            DispatchQueue.main.async {
-//                if let error = error {
-//                    print("❌ Network error: \(error.localizedDescription)")
-//                    self.textLabel.text = "Ошибка подключения"
-//                    return
-//                }
-//
-//                guard let data = data else {
-//                    print("❌ No data received")
-//                    self.textLabel.text = "Нет данных от сервера"
-//                    return
-//                }
-//
-//                do {
-//                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-//                       let content = json["Content"] as? String {
-//                        self.textLabel.text = content
-//                    } else {
-//                        print("⚠️ Unexpected response format")
-//                        print("📦 Response:", String(data: data, encoding: .utf8) ?? "n/a")
-//                        self.textLabel.text = "Ошибка при получении текста"
-//                    }
-//                } catch {
-//                    print("❌ JSON parsing error: \(error.localizedDescription)")
-//                    self.textLabel.text = "Ошибка при обработке данных"
-//                }
-//            }
-//        }.resume()
-//    }
-//}

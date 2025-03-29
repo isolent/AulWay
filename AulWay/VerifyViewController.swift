@@ -18,6 +18,7 @@ class VerifyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         emailLabel.text = email
+        configureTextField(codeTextField)
     }
 
     @IBAction func verifyTapped(_ sender: UIButton) {
@@ -131,6 +132,12 @@ class VerifyViewController: UIViewController {
         if let signInVC = storyboard.instantiateViewController(withIdentifier: "SignInViewController") as? SignInViewController {
             self.navigationController?.pushViewController(signInVC, animated: true)
         }
+    }
+    private func configureTextField(_ textField: UITextField) {
+        textField.layer.borderWidth = 1.0
+        textField.layer.borderColor = UIColor.lightGray.cgColor
+        textField.layer.cornerRadius = textField.frame.height / 2
+        textField.clipsToBounds = true
     }
 }
 

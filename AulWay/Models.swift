@@ -129,3 +129,17 @@ struct Slot: Codable {
         return Slot()
     }
 }
+
+struct Page: Decodable {
+    let id: Int
+    let title: String
+    let content: String
+    let updatedAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case id = "ID"
+        case title = "Title"
+        case content = "Content"
+        case updatedAt = "UpdatedAt"
+    }
+}

@@ -21,14 +21,8 @@ class LoadingViewController: UIViewController {
         
         Path.text = "\(fromLocation) → \(toLocation)"
         DateInfo.text = DateFormatter.localizedString(from: travelDate, dateStyle: .medium, timeStyle: .none)
-
-
         progressView.progress = 0.0
-
-
         resetBusPosition()
-
-
         startBusAnimation(duration: 5.0)
     }
 
@@ -50,44 +44,47 @@ class LoadingViewController: UIViewController {
         
         
     }
-
         
-        func startBusAnimation(duration: TimeInterval) {
+    func startBusAnimation(duration: TimeInterval) {
+        progressView.progress = 0.0
+        resetBusPosition()
 
-            progressView.progress = 0.0
-            resetBusPosition()
+        let totalSteps = Int(duration * 60)
+        var currentStep = 0
 
+        let progressWidth = progressView.frame.width
+        let busWidth = busImageView.frame.width
+        let startX = progressView.frame.origin.x
+        let destinationX = startX + progressWidth - busWidth
 
-            let totalSteps = Int(duration * 60)
-            var currentStep = 0
+        animationTimer?.invalidate()
 
+        animationTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { timer in
+            currentStep += 1
+            let progress = Float(currentStep) / Float(totalSteps)
 
-            let progressWidth = progressView.frame.width
-            let busWidth = busImageView.frame.width
-            let startX = progressView.frame.origin.x
-            let destinationX = startX + progressWidth - busWidth
+            self.progressView.progress = progress
+            let newX = startX + CGFloat(progress) * (destinationX - startX)
+            self.busImageView.frame.origin.x = newX
 
-
-            animationTimer?.invalidate()
-
-
-            animationTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { timer in
-                currentStep += 1
-                let progress = Float(currentStep) / Float(totalSteps)
-
+            if currentStep >= totalSteps {
+                timer.invalidate()
                 
-                self.progressView.progress = progress
-
-                
-                let newX = startX + CGFloat(progress) * (destinationX - startX)
-                self.busImageView.frame.origin.x = newX
-
-            
-                if currentStep >= totalSteps {
-                    timer.invalidate()
+                if self.slotList.isEmpty {
+                    self.showNoResultPage()
+                } else {
                     self.performSegue(withIdentifier: "showTicketList", sender: self)
                 }
             }
         }
+    }
+
+    
+    private func showNoResultPage() {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        if let noResultVC = storyboard.instantiateViewController(withIdentifier: "ResultNFViewController") as? ResultNFViewController {
+            self.navigationController?.pushViewController(noResultVC, animated: true)
+        }
+    }
 }
 

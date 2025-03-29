@@ -1633,15 +1633,6 @@
                                     <constraint firstAttribute="height" constant="355" id="Euw-P8-fHl"/>
                                     <constraint firstAttribute="width" constant="340" id="nET-7z-Bc3"/>
                                 </constraints>
-                                <string key="text">Простое цифровое решение для бронирования автобусных билетов и отслеживания расписания всегда связывает сельские и городские районы Казахстана. 
-
-Наше удобное приложение позволяет легко находить маршруты, безопасно бронировать билеты и быть в курсе ваших путешествий.
-
-Мы сотрудничаем с поставщиками транспортных услуг, чтобы обеспечить более качественные услуги. 
-
-Присоединяйтесь к нам, чтобы сделать путешествия разумнее и доступнее для всех.
-
-— Команда AulWay</string>
                                 <color key="textColor" systemColor="labelColor"/>
                                 <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -1695,54 +1686,6 @@
                                     <constraint firstAttribute="height" constant="500" id="2mW-JP-aHp"/>
                                     <constraint firstAttribute="width" constant="340" id="RF1-GA-oWH"/>
                                 </constraints>
-                                <string key="text">1. Введение
-Добро пожаловать в AulWay! Мы ценим вашу конфиденциальность и безопасность. В данном разделе подробно описано, какие данные мы собираем, как они используются и какие меры принимаются для их защиты.
-
-2. Сбор данных
-Для обеспечения работы приложения мы собираем следующую информацию:
-
-Личная информация: имя, адрес электронной почты, номер телефона.
-
-Информация о путешествиях: маршруты, забронированные билеты, данные об оплате.
-
-Местоположение (необязательно): используется для определения ближайших маршрутов.
-
-3. Использование данных
-Собранная информация применяется для:
-
-Организации бронирования и оплаты билетов.
-
-Улучшения сервиса и персонализации предложений.
-
-Обеспечения безопасности платежей и предотвращения мошенничества.
-
-4. Защита данных
-Все платежные данные зашифрованы и не хранятся в приложении.
-
-Личная информация пользователей защищена в соответствии с международными стандартами безопасности.
-
-Для дополнительной защиты учетных записей используется двухфакторная аутентификация.
-
-5. Контроль и права пользователя
-Вы можете:
-
-Запросить удаление или изменение персональных данных.
-
-Отключить передачу геолокации в настройках устройства.
-
-Настроить уведомления и параметры персонализации.
-
-
-6. Безопасность учетной записи
-Для защиты учетной записи мы рекомендуем:
-
-Использовать надежные пароли.
-
-Не передавать личные данные третьим лицам.
-
-В случае подозрительной активности незамедлительно обращаться в службу поддержки.
-
-Если у вас есть вопросы по обработке данных, свяжитесь с нашей службой поддержки.</string>
                                 <color key="textColor" systemColor="labelColor"/>
                                 <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -1790,44 +1733,13 @@
                                 <color key="textColor" systemColor="systemBackgroundColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="B37-6g-qbd">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="x" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="B37-6g-qbd">
                                 <rect key="frame" x="26.666666666666657" y="201" width="340" height="500"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="500" id="9kf-1E-3GB"/>
                                     <constraint firstAttribute="width" constant="340" id="lUc-TF-jYn"/>
                                 </constraints>
-                                <string key="text">Добро пожаловать на страницу справки и поддержки! Если у вас есть вопросы или возникли сложности при использовании AulWay, мы всегда готовы помочь. Ниже вы найдете ответы на часто задаваемые вопросы, рекомендации по устранению неполадок и способы связи с нашей службой поддержки.
-
-1. Часто задаваемые вопросы (FAQ)
-❓ Как забронировать билет на автобус?
-▶ Введите пункты отправления и назначения, выберите дату поездки и подходящий автобус. Затем произведите оплату, чтобы подтвердить бронирование.
-
-❓ Как посмотреть свои билеты?
-▶ Все забронированные билеты доступны в разделе "Мои билеты" в вашем профиле.
-
-❓ Какие способы оплаты доступны?
-▶ Мы поддерживаем кредитные и дебетовые карты, мобильные платежи и другие безопасные методы.
-
-❓ Можно ли отменить или перенести билет?
-▶ Возможность отмены или изменения даты поездки зависит от политики автобусного оператора. Проверьте доступные варианты в разделе "Мои билеты".
-
-❓ Я не получил подтверждение бронирования. Что делать?
-▶ Проверьте папку "Спам" в электронной почте. Если письма там нет, свяжитесь с нашей поддержкой.
-
-2. Устранение неполадок
-🔹 Приложение работает некорректно? Попробуйте закрыть и снова открыть его или обновить до последней версии.
-🔹 Ошибка при оплате? Убедитесь, что у вас достаточно средств и стабильное подключение к интернету.
-🔹 Не отображаются билеты? Выйдите из аккаунта и войдите снова или обновите страницу "Мои билеты".
-
-3. Свяжитесь с нами
-Если вам нужна помощь, мы всегда на связи:
-
-📧 Email: support@aulway.kz
-📞 Телефон: +7 XXX-XXX-XXXX
-💬 Чат: Доступен в приложении в разделе "Поддержка"
-
-Мы здесь, чтобы помочь. Приятных поездок с AulWay! 🚍</string>
                                 <color key="textColor" systemColor="labelColor"/>
                                 <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -2322,7 +2234,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="magnifyingglass" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="gYM-7D-yFW">
-                                <rect key="frame" x="121.66666666666669" y="323" width="150" height="148.33333333333331"/>
+                                <rect key="frame" x="121.66666666666669" y="293" width="150" height="148.33333333333331"/>
                                 <color key="tintColor" systemColor="systemGray6Color"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="150" id="FFX-Hm-yQk"/>
@@ -2330,13 +2242,13 @@
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Результаты не найдены" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XCY-Xs-cW1">
-                                <rect key="frame" x="29" y="502" width="335" height="41"/>
+                                <rect key="frame" x="29" y="472" width="335" height="41"/>
                                 <fontDescription key="fontDescription" name="AvenirNext-Medium" family="Avenir Next" pointSize="30"/>
                                 <color key="textColor" systemColor="systemGray5Color"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Не найдено никаких результатов по этому маршруту" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EcJ-lW-BGg">
-                                <rect key="frame" x="20" y="548" width="353" height="49.333333333333371"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Не найдено результатов по этому маршруту" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EcJ-lW-BGg">
+                                <rect key="frame" x="20" y="518" width="353" height="49.333333333333371"/>
                                 <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="18"/>
                                 <color key="textColor" systemColor="systemGray5Color"/>
                                 <nil key="highlightedColor"/>
@@ -2356,7 +2268,7 @@
                             <constraint firstItem="cnq-aQ-lvw" firstAttribute="trailing" secondItem="jHf-c7-N6w" secondAttribute="trailing" id="d7W-vX-FZc"/>
                             <constraint firstItem="EcJ-lW-BGg" firstAttribute="leading" secondItem="doe-3k-pqR" secondAttribute="leading" constant="20" id="ezr-Au-diz"/>
                             <constraint firstItem="XCY-Xs-cW1" firstAttribute="centerX" secondItem="doe-3k-pqR" secondAttribute="centerX" id="kdN-aP-ss5"/>
-                            <constraint firstItem="gYM-7D-yFW" firstAttribute="top" secondItem="F2Y-mP-zuL" secondAttribute="bottom" constant="200" id="otg-Ip-s6N"/>
+                            <constraint firstItem="gYM-7D-yFW" firstAttribute="top" secondItem="F2Y-mP-zuL" secondAttribute="bottom" constant="170" id="otg-Ip-s6N"/>
                             <constraint firstItem="cnq-aQ-lvw" firstAttribute="top" secondItem="doe-3k-pqR" secondAttribute="top" constant="-5" id="qL0-Pn-P8G"/>
                             <constraint firstItem="gYM-7D-yFW" firstAttribute="centerX" secondItem="doe-3k-pqR" secondAttribute="centerX" id="qwV-jD-Vtl"/>
                             <constraint firstAttribute="bottom" secondItem="cnq-aQ-lvw" secondAttribute="bottom" constant="-22" id="s7M-ZP-GxD"/>
@@ -3573,19 +3485,19 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray4Color">
-            <color red="0.81960784313725488" green="0.81960784313725488" blue="0.83921568627450982" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.81960784310000001" green="0.81960784310000001" blue="0.83921568629999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGray5Color">
-            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.8980392157" green="0.8980392157" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGray6Color">
-            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="tertiarySystemGroupedBackgroundColor">
-            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="viewFlipsideBackgroundColor">
             <color red="0.12156862745098039" green="0.12941176470588237" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
