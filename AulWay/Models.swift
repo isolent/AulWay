@@ -20,9 +20,10 @@ struct Ticket: Codable {
     let path: String
     let paid: Bool
     let qrCodeBase64: String?
+    let order_number: String
 
     enum CodingKeys: String, CodingKey {
-        case id, user_id, route_id, price, status, payment_status, qr_code, created_at, slot, path, paid, qrCodeBase64
+        case id, user_id, route_id, price, status, payment_status, qr_code, created_at, slot, path, paid, qrCodeBase64,order_number
     }
 
     init(from decoder: Decoder) throws {
@@ -41,10 +42,9 @@ struct Ticket: Codable {
         path = try container.decodeIfPresent(String.self, forKey: .path) ?? ""
         paid = try container.decodeIfPresent(Bool.self, forKey: .paid) ?? false
         qrCodeBase64 = try container.decodeIfPresent(String.self, forKey: .qrCodeBase64) ?? ""
+        order_number = try container.decode(String.self, forKey: .order_number)
     }
 }
-
-import Foundation
 
 struct Slot: Codable {
     let id: String
@@ -59,6 +59,7 @@ struct Slot: Codable {
 //    let updated_at: String?
     let carNumber: String?
     let availableSeats: Int?
+    var isFavourite: Bool?
 
     static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -69,7 +70,7 @@ struct Slot: Codable {
 
     enum CodingKeys: String, CodingKey {
         case id, departure, destination, start_date, end_date, available_seats, bus_id, price, carNumber = "bus_number",
-             availableSeats = "bus_total_seats"
+             availableSeats = "bus_total_seats", isFavourite
     }
 
     init(from decoder: Decoder) throws {
@@ -84,7 +85,8 @@ struct Slot: Codable {
 //        updated_at = try container.decode(String.self, forKey: .updated_at)
         carNumber = try container.decodeIfPresent(String.self, forKey: .carNumber)
         availableSeats = try container.decodeIfPresent(Int.self, forKey: .availableSeats)
-
+        isFavourite = try container.decodeIfPresent(Bool.self, forKey: .isFavourite)
+        
         let startDateString = try container.decode(String.self, forKey: .start_date)
         let endDateString = try container.decode(String.self, forKey: .end_date)
 
@@ -109,7 +111,8 @@ struct Slot: Codable {
 //        created_at: String = "",
 //        updated_at: String = "",
         carNumber: String? = nil,
-        availableSeats: Int? = nil
+        availableSeats: Int? = nil,
+        isFavourite: Bool? = false
     ) {
         self.id = id
         self.departure = departure
@@ -123,6 +126,7 @@ struct Slot: Codable {
 //        self.updated_at = updated_at
         self.carNumber = carNumber
         self.availableSeats = availableSeats
+        self.isFavourite = isFavourite
     }
 
     static func defaultSlot() -> Slot {

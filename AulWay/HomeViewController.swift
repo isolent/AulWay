@@ -30,7 +30,8 @@ class HomeViewController: UIViewController {
     
     func setupUI() {
         PassengerInfo.text = "\(passengerCount) passenger"
-        PassengerInfo.backgroundColor = UIColor.lightGray
+        PassengerInfo.backgroundColor = UIColor(red: 217/255, green: 217/255, blue: 217/255, alpha: 1.0)
+
         PassengerInfo.layer.cornerRadius = PassengerInfo.frame.height / 2
         PassengerInfo.layer.masksToBounds = true
         
@@ -139,7 +140,7 @@ class HomeViewController: UIViewController {
                     decoder.dateDecodingStrategy = .iso8601
                     let slots = try decoder.decode([Slot].self, from: data)
 
-                    self.slotCount = slots.count // ✅ store slot count
+                    self.slotCount = slots.count
                     print("✅ Найдено маршрутов: \(self.slotCount)")
 
                     self.performSegue(withIdentifier: "toLoading", sender: self)
@@ -165,7 +166,7 @@ class HomeViewController: UIViewController {
                 loadingVC.toLocation = To.text ?? ""
                 loadingVC.travelDate = SelectedDate.date
                 loadingVC.passengerCount = passengerCount
-                loadingVC.slotList = Array(repeating: Slot(), count: slotCount) // ✅ pass fake array with length
+                loadingVC.slotList = Array(repeating: Slot(), count: slotCount)
             }
         }
     }

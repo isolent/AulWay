@@ -14,6 +14,7 @@ class UserTicketsTableViewCell: UITableViewCell {
     @IBOutlet weak var Status: UILabel!
     @IBOutlet weak var CarNumber: UILabel!
     @IBOutlet weak var Path: UILabel!
+    
     override func awakeFromNib() {
        super.awakeFromNib()
        configureCell()

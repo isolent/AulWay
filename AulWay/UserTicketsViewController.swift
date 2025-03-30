@@ -8,18 +8,49 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
     }
 
     var currentTicketType: TicketType = .upcoming
-    var pastTickets: [Ticket] = []
-    var upcomingTickets: [Ticket] = []
+    var allPastTickets: [Ticket] = []
+    var allUpcomingTickets: [Ticket] = []
+    var displayedTickets: [Ticket] = []
+
+    private var currentPage = 1
+    private let pageSize = 3
 
     @IBOutlet weak var tickets: UITableView!
     @IBOutlet weak var upcomingButton: UIButton!
     @IBOutlet weak var pastButton: UIButton!
+
+    private let prevPageButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("←", for: .normal)
+        button.setTitleColor(.gray, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 24, weight: .regular)
+        button.isEnabled = false
+        return button
+    }()
+
+    private let nextPageButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("→", for: .normal)
+        button.setTitleColor(.gray, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 24, weight: .regular)
+        return button
+    }()
+
+    private let pageLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Page 1"
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 14, weight: .medium)
+        label.textColor = .white
+        return label
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tickets.delegate = self
         tickets.dataSource = self
         styleButtons()
+        setupPaginationUI()
         fetchTickets()
     }
 
@@ -28,36 +59,79 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
         fetchTickets()
     }
 
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return currentTicketType == .past ? pastTickets.count : upcomingTickets.count
+    private func setupPaginationUI() {
+        let stackView = UIStackView(arrangedSubviews: [prevPageButton, pageLabel, nextPageButton])
+        stackView.axis = .horizontal
+        stackView.spacing = 12
+        stackView.alignment = .center
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(stackView)
+        NSLayoutConstraint.activate([
+            stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
+            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+
+        prevPageButton.addTarget(self, action: #selector(prevPageTapped), for: .touchUpInside)
+        nextPageButton.addTarget(self, action: #selector(nextPageTapped), for: .touchUpInside)
     }
 
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 10
+    @objc private func prevPageTapped() {
+        guard currentPage > 1 else { return }
+        currentPage -= 1
+        updateDisplayedTickets()
+    }
+
+    @objc private func nextPageTapped() {
+        let allTickets = currentTicketType == .past ? allPastTickets : allUpcomingTickets
+        let totalPages = Int(ceil(Double(allTickets.count) / Double(pageSize)))
+        guard currentPage < totalPages else { return }
+        currentPage += 1
+        updateDisplayedTickets()
+    }
+
+    private func updateDisplayedTickets() {
+        let allTickets = currentTicketType == .past ? allPastTickets : allUpcomingTickets
+        let startIndex = (currentPage - 1) * pageSize
+        let endIndex = min(startIndex + pageSize, allTickets.count)
+        if startIndex < endIndex {
+            displayedTickets = Array(allTickets[startIndex..<endIndex])
+        } else {
+            displayedTickets = []
+        }
+        tickets.reloadData()
+        updatePaginationUI()
+    }
+
+    private func updatePaginationUI() {
+        pageLabel.text = "Page \(currentPage)"
+        let allTickets = currentTicketType == .past ? allPastTickets : allUpcomingTickets
+        let totalPages = Int(ceil(Double(allTickets.count) / Double(pageSize)))
+
+        prevPageButton.isEnabled = currentPage > 1
+        nextPageButton.isEnabled = currentPage < totalPages
+
+        prevPageButton.titleLabel?.font = .systemFont(ofSize: 24, weight: prevPageButton.isEnabled ? .bold : .regular)
+        nextPageButton.titleLabel?.font = .systemFont(ofSize: 24, weight: nextPageButton.isEnabled ? .bold : .regular)
+    }
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return displayedTickets.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TicketsTableViewCell", for: indexPath) as! UserTicketsTableViewCell
 
-        let ticket = currentTicketType == .past ? pastTickets[indexPath.row] : upcomingTickets[indexPath.row]
-
+        let ticket = displayedTickets[indexPath.row]
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d MMM"
         cell.Date.text = dateFormatter.string(from: ticket.slot.start_date)
-
-        let timeString = "\(dateFormatter.string(from: ticket.slot.start_date)) - \(dateFormatter.string(from: ticket.slot.end_date))"
-
-        let durationFormatter = DateComponentsFormatter()
-        durationFormatter.unitsStyle = .abbreviated
-        durationFormatter.allowedUnits = [.hour, .minute]
-        let duration = durationFormatter.string(from: ticket.slot.start_date, to: ticket.slot.end_date) ?? "N/A"
 
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "HH:mm"
         cell.Time.text = "\(timeFormatter.string(from: ticket.slot.start_date)) - \(timeFormatter.string(from: ticket.slot.end_date))"
 
         cell.Path.text = "\(ticket.slot.departure) - \(ticket.slot.destination)"
-//        cell.Status.text = ticket.paid ? "Paid" : "Unpaid"
         cell.Status.text = "Paid"
         cell.CarNumber.text = ticket.slot.carNumber ?? "-"
 
@@ -66,9 +140,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-
-        let ticket = currentTicketType == .past ? pastTickets[indexPath.row] : upcomingTickets[indexPath.row]
-
+        let ticket = displayedTickets[indexPath.row]
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         if let ticketDetailsVC = storyboard.instantiateViewController(withIdentifier: "TicketDetailsViewController") as? TicketDetailsViewController {
             ticketDetailsVC.ticketId = ticket.id
@@ -77,11 +149,11 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
         }
     }
 
-
     @IBAction func switchTicketType(_ sender: UIButton) {
         currentTicketType = sender == upcomingButton ? .upcoming : .past
         updateButtonStyles()
-        tickets.reloadData()
+        currentPage = 1
+        updateDisplayedTickets()
     }
 
     private func styleButtons() {
@@ -114,53 +186,22 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
             return
         }
 
-        fetchTickets(for: "past", userId: userId, token: token) { tickets in
-            let newTickets = tickets.filter { newTicket in
-                !self.pastTickets.contains(where: { $0.id == newTicket.id })
-            }
-            self.pastTickets.append(contentsOf: newTickets)
-            if self.currentTicketType == .past {
-                DispatchQueue.main.async {
-                    self.tickets.reloadData()
-                }
-            }
-        }
-
-        fetchTickets(for: "upcoming", userId: userId, token: token) { tickets in
-            let newTickets = tickets.filter { newTicket in
-                !self.upcomingTickets.contains(where: { $0.id == newTicket.id })
-            }
-            self.upcomingTickets.append(contentsOf: newTickets)
-            if self.currentTicketType == .upcoming {
-                DispatchQueue.main.async {
-                    self.tickets.reloadData()
-                }
-            }
+        let types: [TicketType] = [.past, .upcoming]
+        for type in types {
+            fetchTickets(for: type, userId: userId, token: token)
         }
     }
 
-    private func fetchTickets(for type: String, userId: String, token: String, completion: @escaping ([Ticket]) -> Void) {
-        let urlString = "http://localhost:8080/api/tickets/users/\(userId)?type=\(type)"
-        guard let url = URL(string: urlString) else {
-            print("❌ Неверный URL")
-            return
-        }
+    private func fetchTickets(for type: TicketType, userId: String, token: String) {
+        let typeStr = type == .past ? "past" : "upcoming"
+        let urlString = "http://localhost:8080/api/tickets/users/\(userId)?type=\(typeStr)"
+        guard let url = URL(string: urlString) else { return }
 
         var request = URLRequest(url: url)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
         URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("❌ Ошибка загрузки \(type) билетов: \(error)")
-                completion([])
-                return
-            }
-
-            guard let data = data else {
-                print("❌ Пустой ответ при получении \(type) билетов")
-                completion([])
-                return
-            }
+            guard let data = data else { return }
 
             do {
                 var fetchedTickets = try JSONDecoder().decode([Ticket].self, from: data)
@@ -177,57 +218,35 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
                 }
 
                 group.notify(queue: .main) {
-//                    print("✅ \(type.capitalized) билеты успешно загружены: \(fetchedTickets.count)")
-
-//                    for newTicket in fetchedTickets {
-//                        switch type {
-//                        case "past":
-//                            if let index = self.pastTickets.firstIndex(where: { $0.id == newTicket.id }) {
-//                                self.pastTickets[index] = newTicket
-//                            } else {
-//                                self.pastTickets.append(newTicket)
-//                            }
-//                        case "upcoming":
-//                            if let index = self.upcomingTickets.firstIndex(where: { $0.id == newTicket.id }) {
-//                                self.upcomingTickets[index] = newTicket
-//                            } else {
-//                                self.upcomingTickets.append(newTicket)
-//                            }
-//                        default:
-//                            break
-//                        }
-//                    }
-
-                    if (type == "past" && self.currentTicketType == .past) ||
-                       (type == "upcoming" && self.currentTicketType == .upcoming) {
-                        self.tickets.reloadData()
+                    if type == .past {
+                        self.allPastTickets = fetchedTickets
+                    } else {
+                        self.allUpcomingTickets = fetchedTickets
                     }
 
-                    completion(fetchedTickets)
+                    if type == self.currentTicketType {
+                        self.currentPage = 1
+                        self.updateDisplayedTickets()
+                    }
                 }
             } catch {
-                print("❌ Ошибка парсинга \(type) билетов: \(error)")
-                completion([])
+                print("❌ Ошибка парсинга билетов: \(error)")
             }
         }.resume()
     }
 
-
     private func fetchSlot(for routeId: String, token: String, completion: @escaping (Slot?) -> Void) {
         let urlString = "http://localhost:8080/api/routes/\(routeId)"
         guard let url = URL(string: urlString) else {
-            print("❌ Неверный URL слота")
             completion(nil)
             return
         }
 
         var request = URLRequest(url: url)
-        request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        URLSession.shared.dataTask(with: request) { data, _, _ in
             guard let data = data else {
-                print("❌ Нет данных от API слота")
                 completion(nil)
                 return
             }
@@ -236,10 +255,8 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategy = .formatted(Slot.dateFormatter)
                 let slot = try decoder.decode(Slot.self, from: data)
-//                print("📩 Slot для routeId \(routeId): \(slot.departure) - \(slot.destination)")
                 completion(slot)
             } catch {
-                print("❌ Ошибка декодирования слота: \(error)")
                 completion(nil)
             }
         }.resume()

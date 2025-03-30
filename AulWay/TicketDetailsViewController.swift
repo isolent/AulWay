@@ -19,21 +19,25 @@ class TicketDetailsViewController: UIViewController {
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var busNumberLabel: UILabel!
     @IBOutlet weak var shareButton: UIImageView!
+    @IBOutlet weak var orderNumberLabel: UILabel!
     var ticketId: String = ""
     var userId: String = ""
 
+    @IBOutlet weak var fifthStackView: UIStackView!
     @IBOutlet weak var firstStackView: UIStackView!
-    
     @IBOutlet weak var secondStackView: UIStackView!
-    
     @IBOutlet weak var thirdStackView: UIStackView!
     @IBOutlet weak var fourthStackView: UIStackView!
-    
     @IBOutlet weak var mainStackView: UIStackView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupContainers()
         fetchTicketDetails()
+        shareButton.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(shareTapped))
+        shareButton.addGestureRecognizer(tap)
+
     }
 
     private func fetchTicketDetails() {
@@ -64,6 +68,10 @@ class TicketDetailsViewController: UIViewController {
             }
 
             do {
+//                if let json = String(data: data, encoding: .utf8) {
+//                    print("📄 Ticket JSON Response:\n\(json)")
+//                }
+
                 let ticket = try JSONDecoder().decode(Ticket.self, from: data)
                 DispatchQueue.main.async {
                     self.populateTicketUI(ticket: ticket)
@@ -123,6 +131,10 @@ class TicketDetailsViewController: UIViewController {
     private func populateTicketUI(ticket: Ticket) {
         priceLabel.text = "\(ticket.price) ₸"
         statusLabel.text = ticket.payment_status.capitalized
+        orderNumberLabel.text = "\(ticket.order_number)"
+        
+//        print("📦 Order Number: \(ticket.order_number)")
+
         qrImageView.backgroundColor = .white
 
         if !ticket.qr_code.isEmpty {
@@ -141,6 +153,7 @@ class TicketDetailsViewController: UIViewController {
         }
     }
 
+
     private func formattedTime(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
@@ -154,7 +167,7 @@ class TicketDetailsViewController: UIViewController {
             filter.setValue(data, forKey: "inputMessage")
             filter.setValue("Q", forKey: "inputCorrectionLevel")
 
-            let transform = CGAffineTransform(scaleX: 12, y: 12) // увеличил
+            let transform = CGAffineTransform(scaleX: 12, y: 12)
 
             if let output = filter.outputImage?.transformed(by: transform) {
                 let context = CIContext()
@@ -167,22 +180,39 @@ class TicketDetailsViewController: UIViewController {
     }
 
     private func setupContainers() {
-        let containers = [firstStackView, secondStackView, thirdStackView, fourthStackView]
-        
+        let containers = [firstStackView, secondStackView, thirdStackView, fourthStackView, fifthStackView]
+
         for container in containers {
             container?.translatesAutoresizingMaskIntoConstraints = false
-            container?.layer.cornerRadius = 16
-            container?.backgroundColor = UIColor(white: 1.0, alpha: 0.1)
+            container?.layer.cornerRadius = 10
+            container?.backgroundColor = UIColor(white: 1.0, alpha: 0.9)
             container?.clipsToBounds = true
             
-            container?.layoutMargins = UIEdgeInsets(top: 10, left: 12, bottom: 10, right: 12)
-            
-            if let stackView = container?.subviews.first(where: { $0 is UIStackView }) as? UIStackView {
-                stackView.isLayoutMarginsRelativeArrangement = true
-                stackView.layoutMargins = container!.layoutMargins
-            }
+            container?.isLayoutMarginsRelativeArrangement = true
+            container?.layoutMargins = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+        }
+    }
+    
+    func createPDF(from view: UIView) -> Data {
+        let pdfRenderer = UIGraphicsPDFRenderer(bounds: view.bounds)
+        return pdfRenderer.pdfData { context in
+            context.beginPage()
+            view.layer.render(in: context.cgContext)
         }
     }
 
+    @objc private func shareTapped() {
+        
+        let pdfData = createPDF(from: mainStackView)
 
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("ticket.pdf")
+        do {
+            try pdfData.write(to: tempURL)
+            let activityVC = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
+            activityVC.popoverPresentationController?.sourceView = shareButton
+            present(activityVC, animated: true)
+        } catch {
+            print("❌ Failed to write PDF: \(error)")
+        }
+    }
 }
