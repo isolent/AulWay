@@ -4,34 +4,33 @@ class LoadingViewController: UIViewController {
 
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var busImageView: UIImageView!
-    
     @IBOutlet weak var Path: UILabel!
     @IBOutlet weak var DateInfo: UILabel!
-    
+
     var fromLocation: String = ""
     var toLocation: String = ""
     var travelDate: Date = Date()
     var passengerCount: Int = 1
     var slotList: [Slot] = []
-    
+
     var animationTimer: Timer?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         Path.text = "\(fromLocation) → \(toLocation)"
         DateInfo.text = DateFormatter.localizedString(from: travelDate, dateStyle: .medium, timeStyle: .none)
+
         progressView.progress = 0.0
         resetBusPosition()
         startBusAnimation(duration: 5.0)
     }
 
-    
     func resetBusPosition() {
         let startX = progressView.frame.origin.x
         busImageView.frame.origin.x = startX
     }
-    
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showTicketList" {
             if let ticketListVC = segue.destination as? SearchResultViewController {
@@ -41,10 +40,8 @@ class LoadingViewController: UIViewController {
                 ticketListVC.passengerCount = passengerCount
             }
         }
-        
-        
     }
-        
+
     func startBusAnimation(duration: TimeInterval) {
         progressView.progress = 0.0
         resetBusPosition()
@@ -64,14 +61,13 @@ class LoadingViewController: UIViewController {
             let progress = Float(currentStep) / Float(totalSteps)
 
             self.progressView.progress = progress
-            let newX = startX + CGFloat(progress) * (destinationX - startX)
-            self.busImageView.frame.origin.x = newX
+            self.busImageView.frame.origin.x = startX + CGFloat(progress) * (destinationX - startX)
 
             if currentStep >= totalSteps {
                 timer.invalidate()
-                
+
                 if self.slotList.isEmpty {
-                    self.showNoResultPage()
+                    self.navigateToNoResults()
                 } else {
                     self.performSegue(withIdentifier: "showTicketList", sender: self)
                 }
@@ -79,12 +75,18 @@ class LoadingViewController: UIViewController {
         }
     }
 
-    
-    private func showNoResultPage() {
+    private func navigateToNoResults() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         if let noResultVC = storyboard.instantiateViewController(withIdentifier: "ResultNFViewController") as? ResultNFViewController {
-            self.navigationController?.pushViewController(noResultVC, animated: true)
+            
+            noResultVC.path = "\(fromLocation) → \(toLocation)"
+
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            formatter.timeStyle = .none
+            noResultVC.dateInfo = formatter.string(from: travelDate)
+
+            navigationController?.pushViewController(noResultVC, animated: true)
         }
     }
 }
-

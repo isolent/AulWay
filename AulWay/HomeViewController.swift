@@ -20,6 +20,8 @@ class HomeViewController: UIViewController {
             PassengerInfo.text = "\(passengerCount) passenger"
         }
     }
+
+    var slotCount: Int = 0  
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -98,11 +100,9 @@ class HomeViewController: UIViewController {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
 
-
         if let token = UserDefaults.standard.string(forKey: "authToken"), !token.isEmpty {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         } else {
-//            print("❌ No authentication token found.")
             showAlert(message: "Вы не вошли. Пожалуйста, войдите в систему еще раз.")
             return
         }
@@ -119,9 +119,7 @@ class HomeViewController: UIViewController {
                     return
                 }
 
-                // ✅ Debugging Unauthorized Access
                 if httpResponse.statusCode == 401 {
-//                    print("❌ Unauthorized: Invalid token or session expired.")
                     self.showAlert(message: "Сеанс истек. Пожалуйста, войдите в систему еще раз.")
                     return
                 }
@@ -137,11 +135,16 @@ class HomeViewController: UIViewController {
                 }
 
                 do {
-                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-//                    print("✅ Response:", jsonResponse)
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategy = .iso8601
+                    let slots = try decoder.decode([Slot].self, from: data)
+
+                    self.slotCount = slots.count // ✅ store slot count
+                    print("✅ Найдено маршрутов: \(self.slotCount)")
+
                     self.performSegue(withIdentifier: "toLoading", sender: self)
                 } catch {
-                    self.showAlert(message: "JSON Parsing Error: \(error.localizedDescription)")
+                    self.showAlert(message: "Ошибка при разборе JSON: \(error.localizedDescription)")
                 }
             }
         }
@@ -149,20 +152,20 @@ class HomeViewController: UIViewController {
         task.resume()
     }
 
-    
     func showAlert(message: String) {
         let alert = UIAlertController(title: "Invalid Input", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
-    
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "toLoading" {
-            if let ticketListVC = segue.destination as? LoadingViewController {
-                ticketListVC.fromLocation = From.text ?? ""
-                ticketListVC.toLocation = To.text ?? ""
-                ticketListVC.travelDate = SelectedDate.date
-                ticketListVC.passengerCount = passengerCount
+            if let loadingVC = segue.destination as? LoadingViewController {
+                loadingVC.fromLocation = From.text ?? ""
+                loadingVC.toLocation = To.text ?? ""
+                loadingVC.travelDate = SelectedDate.date
+                loadingVC.passengerCount = passengerCount
+                loadingVC.slotList = Array(repeating: Slot(), count: slotCount) // ✅ pass fake array with length
             }
         }
     }

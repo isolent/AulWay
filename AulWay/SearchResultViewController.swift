@@ -143,14 +143,6 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
         task.resume()
     }
 
-
-    private func navigateToResultNFViewController() {
-        if let resultNFVC = storyboard?.instantiateViewController(withIdentifier: "ResultNFViewController") {
-            resultNFVC.modalPresentationStyle = .fullScreen
-            present(resultNFVC, animated: true, completion: nil)
-        }
-    }
-
     func handleError(message: String) {
         let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
