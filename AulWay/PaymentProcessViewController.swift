@@ -104,14 +104,14 @@ class PaymentProcessViewController: UIViewController {
                             self.showAlert(title: "Ошибка", message: "Билеты не найдены.")
                             return
                         }
-                        self.navigateToPaymentFailed()
-//                        self.saveTicketsToUserDefaults()
-//                        self.navigateToPaymentConfirmation()
+                        
+                        self.saveTicketsToUserDefaults()
+                        self.navigateToPaymentConfirmation()
 
                     } catch {
 //                        self.showAlert(title: "Ошибка", message: "Ошибка при обработке билетов: \(error.localizedDescription)")
                         
-
+                        self.navigateToPaymentFailed()
                     }
                 }
             }
