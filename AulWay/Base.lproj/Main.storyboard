@@ -560,14 +560,14 @@
                                                             <rect key="frame" x="0.0" y="47" width="293" height="20.333333333333329"/>
                                                             <subviews>
                                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="14:00-16:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="paJ-0i-fOS">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="146.66666666666666" height="19.333333333333332"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="146.66666666666666" height="20.333333333333332"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="12"/>
                                                                     <nil key="textColor"/>
                                                                     <nil key="highlightedColor"/>
                                                                 </label>
                                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1 h 40 min" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JB5-ME-Hmv">
-                                                                    <rect key="frame" x="146.33333333333337" y="0.0" width="146.66666666666663" height="19.333333333333332"/>
+                                                                    <rect key="frame" x="146.33333333333337" y="0.0" width="146.66666666666663" height="20.333333333333332"/>
                                                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                                     <nil key="textColor"/>
                                                                     <nil key="highlightedColor"/>
@@ -3727,7 +3727,7 @@
         <!--PaymentProcessViewController-->
         <scene sceneID="svT-uG-sTW">
             <objects>
-                <viewController storyboardIdentifier="PaymentFailedViewController" id="pA8-7D-uZs" userLabel="PaymentProcessViewController" customClass="PaymentProcessViewController" customModule="AulWay" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PaymentFailedViewController" id="pA8-7D-uZs" userLabel="PaymentProcessViewController" customClass="PaymentFailedViewController" customModule="AulWay" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Ply-3I-N9s">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -3758,11 +3758,14 @@
                                     <constraint firstAttribute="height" constant="50" id="zMh-yL-46b"/>
                                 </constraints>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="gray" title="Пробовать снова" cornerStyle="dynamic">
+                                <buttonConfiguration key="configuration" style="gray" title="Попробовать снова" cornerStyle="dynamic">
                                     <backgroundConfiguration key="background" cornerRadius="50"/>
                                     <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <color key="baseBackgroundColor" red="0.52549022440000004" green="0.55294120309999995" blue="0.48627454040000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </buttonConfiguration>
+                                <connections>
+                                    <action selector="tryAgainTapped:" destination="pA8-7D-uZs" eventType="touchUpInside" id="N29-VK-hx3"/>
+                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="SPe-aP-xDG"/>
@@ -3780,6 +3783,9 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="tSe-lp-8cd"/>
+                    <connections>
+                        <outlet property="tryAgainButton" destination="Bho-fV-Xhr" id="hib-8l-jug"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fjF-W0-ac0" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -3788,8 +3794,8 @@
     </scenes>
     <resources>
         <image name="background" width="402" height="874"/>
-        <image name="bus" width="33" height="24"/>
         <image name="bus" catalog="system" width="128" height="122"/>
+        <image name="bus" width="33" height="24"/>
         <image name="card" width="428" height="208"/>
         <image name="checkmark.circle.fill" catalog="system" width="128" height="123"/>
         <image name="email" width="66" height="62"/>

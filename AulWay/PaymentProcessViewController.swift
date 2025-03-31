@@ -84,7 +84,10 @@ class PaymentProcessViewController: UIViewController {
                     print("📡 Статус код сервера: \(httpResponse.statusCode)")
 
                     guard (200...299).contains(httpResponse.statusCode) else {
-                        self.showAlert(title: "Ошибка", message: "Сервер вернул код ошибки: \(httpResponse.statusCode)")
+                        
+//                        self.showAlert(title: "Ошибка", message: "Сервер вернул код ошибки: \(httpResponse.statusCode)")
+                        self.navigateToPaymentFailed()
+
                         return
                     }
 
@@ -101,12 +104,14 @@ class PaymentProcessViewController: UIViewController {
                             self.showAlert(title: "Ошибка", message: "Билеты не найдены.")
                             return
                         }
-
-                        self.saveTicketsToUserDefaults()
-                        self.navigateToPaymentConfirmation()
+                        self.navigateToPaymentFailed()
+//                        self.saveTicketsToUserDefaults()
+//                        self.navigateToPaymentConfirmation()
 
                     } catch {
-                        self.showAlert(title: "Ошибка", message: "Ошибка при обработке билетов: \(error.localizedDescription)")
+//                        self.showAlert(title: "Ошибка", message: "Ошибка при обработке билетов: \(error.localizedDescription)")
+                        
+
                     }
                 }
             }
@@ -115,7 +120,7 @@ class PaymentProcessViewController: UIViewController {
 
         private func saveTicketsToUserDefaults() {
             do {
-                // Кодируем массив Ticket в Data
+                
                 let encodedData = try JSONEncoder().encode(tickets)
                 UserDefaults.standard.set(encodedData, forKey: "savedTickets")
 
@@ -132,6 +137,15 @@ class PaymentProcessViewController: UIViewController {
                 self.present(confirmationVC, animated: true, completion: nil)
             }
         }
+        private func navigateToPaymentFailed() {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            if let failedVC = storyboard.instantiateViewController(withIdentifier: "PaymentFailedViewController") as? PaymentFailedViewController {
+                self.present(failedVC, animated: true, completion: nil)
+                failedVC.passengerCount=passengerCount
+                failedVC.id = id
+            }
+        }
+    
         
         private func showAlert(title: String, message: String) {
             let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
