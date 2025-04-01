@@ -118,41 +118,12 @@ class ProfileViewController: UIViewController {
         
         present(alert, animated: true, completion: nil)
     }
-    
+
     private func logoutUser() {
-        guard let accessToken = UserDefaults.standard.string(forKey: "access_token") else {
-            print("⚠️ No access token found, logging out locally")
-            completeLogout()
-            return
-        }
-
-        let url = URL(string: "http://localhost:8080/auth/logout")!
-        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("❌ Network error: \(error.localizedDescription)")
-                return
-            }
-            
-            if let httpResponse = response as? HTTPURLResponse {
-                if httpResponse.statusCode == 200 {
-                    print("✅ Successfully logged out from server")
-                } else {
-                    print("⚠️ Server responded with status code: \(httpResponse.statusCode)")
-                }
-            }
-            
-            DispatchQueue.main.async {
-                self.completeLogout()
-            }
-        }
-        task.resume()
+        print("ℹ️ Logging out locally...")
+        completeLogout()
     }
-
-
+    
     private func completeLogout() {
         UserDefaults.standard.removeObject(forKey: "access_token")
         UserDefaults.standard.removeObject(forKey: "user_id")

@@ -28,7 +28,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="22" translatesAutoresizingMaskIntoConstraints="NO" id="1w2-fm-NIt">
-                                <rect key="frame" x="72" y="410.66666666666669" width="249" height="122.33333333333331"/>
+                                <rect key="frame" x="72" y="380.66666666666669" width="249" height="122.33333333333331"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="res-fL-b6r">
                                         <rect key="frame" x="0.0" y="0.0" width="249" height="50.333333333333336"/>
@@ -61,7 +61,7 @@
                                 </subviews>
                             </stackView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Легко находите и бронируйте билеты на автобус по всему Казахстану" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k2l-GU-XUI">
-                                <rect key="frame" x="20" y="623" width="353" height="46.666666666666629"/>
+                                <rect key="frame" x="20" y="608" width="353" height="46.666666666666629"/>
                                 <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -73,9 +73,9 @@
                             <constraint firstAttribute="trailing" secondItem="3EP-kZ-uX1" secondAttribute="trailing" id="1As-lx-e5P"/>
                             <constraint firstItem="k2l-GU-XUI" firstAttribute="leading" secondItem="Ygl-ZH-iSK" secondAttribute="leading" constant="20" id="2Ks-kD-goK"/>
                             <constraint firstItem="qnC-rg-Dxg" firstAttribute="leading" secondItem="Bgf-f3-M57" secondAttribute="leading" constant="110" id="5WB-If-5F0"/>
-                            <constraint firstItem="k2l-GU-XUI" firstAttribute="top" secondItem="1w2-fm-NIt" secondAttribute="bottom" constant="90" id="9b7-PA-RQP"/>
+                            <constraint firstItem="k2l-GU-XUI" firstAttribute="top" secondItem="1w2-fm-NIt" secondAttribute="bottom" constant="105" id="9b7-PA-RQP"/>
                             <constraint firstAttribute="bottom" secondItem="3EP-kZ-uX1" secondAttribute="bottom" id="HQ0-zA-it9"/>
-                            <constraint firstItem="1w2-fm-NIt" firstAttribute="top" secondItem="qnC-rg-Dxg" secondAttribute="bottom" constant="140" id="JKg-KK-V5U"/>
+                            <constraint firstItem="1w2-fm-NIt" firstAttribute="top" secondItem="qnC-rg-Dxg" secondAttribute="bottom" constant="110" id="JKg-KK-V5U"/>
                             <constraint firstItem="qnC-rg-Dxg" firstAttribute="top" secondItem="Bgf-f3-M57" secondAttribute="top" constant="120" id="Mt6-YC-HdX"/>
                             <constraint firstItem="3EP-kZ-uX1" firstAttribute="leading" secondItem="Bgf-f3-M57" secondAttribute="leading" id="aiE-vb-i9W"/>
                             <constraint firstItem="3EP-kZ-uX1" firstAttribute="top" secondItem="Ygl-ZH-iSK" secondAttribute="top" id="noe-KA-KZD"/>

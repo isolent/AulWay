@@ -33,7 +33,7 @@ class ChangePasswordViewController: UIViewController {
         confirmNewPasswordTextField.isSecureTextEntry = true
 
         isPasswordVisible = false
-        togglePasswordVisibilityButton.setTitle("Show password", for: .normal)
+        togglePasswordVisibilityButton.setTitle("Показать пароль", for: .normal)
     }
 
     @IBAction func togglePasswordVisibilityTapped(_ sender: UIButton) {
@@ -44,7 +44,7 @@ class ChangePasswordViewController: UIViewController {
         toggleSecureEntry(for: newPasswordTextField, visible: isPasswordVisible)
         toggleSecureEntry(for: confirmNewPasswordTextField, visible: isPasswordVisible)
 
-        let title = isPasswordVisible ? "Hide password" : "Show password"
+        let title = isPasswordVisible ? "Скрыть пароль" : "Показать пароль"
         togglePasswordVisibilityButton.setTitle(title, for: .normal)
     }
 

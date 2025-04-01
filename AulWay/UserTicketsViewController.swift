@@ -13,7 +13,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
     var displayedTickets: [Ticket] = []
 
     private var currentPage = 1
-    private let pageSize = 3
+    private let pageSize = 10
 
     @IBOutlet weak var tickets: UITableView!
     @IBOutlet weak var upcomingButton: UIButton!

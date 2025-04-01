@@ -15,7 +15,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
     private var allSlots: [Slot] = []
     private var slotList: [Slot] = []
     private var currentPage = 1
-    private let pageSize = 3
+    private let pageSize = 10
     private var isLoading = false
 
     private let prevPageButton: UIButton = {
@@ -55,6 +55,11 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
 
         setupPaginationUI()
         fetchTickets()
+        
+        navigationItem.hidesBackButton = true
+        let backButton = UIBarButtonItem(title: "← Back", style: .plain, target: self, action: #selector(backButtonTapped))
+        navigationItem.leftBarButtonItem = backButton
+
     }
 
     private func setupPaginationUI() {
@@ -284,7 +289,6 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
     }
 
 
-
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         ticketsTableView.deselectRow(at: indexPath, animated: true)
 
@@ -312,5 +316,10 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
         df.unitsStyle = .abbreviated
         df.allowedUnits = [.hour, .minute]
         return df.string(from: slot.start_date, to: slot.end_date) ?? "N/A"
+    }
+    
+    @objc func backButtonTapped() {
+        tabBarController?.selectedIndex = 0
+        navigationController?.popToRootViewController(animated: true)
     }
 }

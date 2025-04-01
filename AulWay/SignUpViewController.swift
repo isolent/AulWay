@@ -8,14 +8,14 @@
 import UIKit
 
 class SignUpViewController: UIViewController {
-    // MARK: - Outlets
+    
     @IBOutlet weak var signInButton: UIButton!
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var confPassTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var signUpButton: UIButton!
     
-    // MARK: - View Life Cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureTextField(emailTextField)
@@ -28,14 +28,6 @@ class SignUpViewController: UIViewController {
         guard let email = emailTextField.text,
               let password = passwordTextField.text else { return }
 
-        
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        if let verifyVC = storyboard.instantiateViewController(withIdentifier: "VerifyViewController") as? VerifyViewController {
-            verifyVC.email = email
-            verifyVC.password = password
-            self.navigationController?.pushViewController(verifyVC, animated: true)
-        }
-        
         registerUser(email: email, password: password)
     }
     
@@ -57,8 +49,6 @@ class SignUpViewController: UIViewController {
             do {
                 if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                     
-//                    print("📦 Server JSON response: \(jsonResponse)") 
-                    
                     if let errorMessage = jsonResponse["errDesc"] as? String, errorMessage == "email already exists" {
                         print("⚠️ Email already registered. Redirecting to UserExistsViewController.")
                         DispatchQueue.main.async {
@@ -73,11 +63,18 @@ class SignUpViewController: UIViewController {
 
                     if let accessToken = accessToken, let userId = userId {
                         print("✅ Successfully signed up!")
-                        print("✅ Successfully signed up!")
                         print("🔑 Token: \(accessToken)")
                         print("🆔 User ID: \(userId)")
                         
                         self.saveUserSession(accessToken: accessToken, userId: userId)
+
+                        DispatchQueue.main.async {
+                            if let verifyVC = self.storyboard?.instantiateViewController(withIdentifier: "VerifyViewController") as? VerifyViewController {
+                                verifyVC.email = email
+                                verifyVC.password = password
+                                self.navigationController?.pushViewController(verifyVC, animated: true)
+                            }
+                        }
                     }
                 } else {
                     print("❌ Failed to parse JSON into dictionary.")
@@ -88,7 +85,6 @@ class SignUpViewController: UIViewController {
         }
         task.resume()
     }
-
 
     func navigateToUserExists() {
         DispatchQueue.main.async {
@@ -104,23 +100,13 @@ class SignUpViewController: UIViewController {
             present(signInVC, animated: true, completion: nil)
         }
     }
-    
 
-    
     private func saveUserSession(accessToken: String, userId: String) {
         let defaults = UserDefaults.standard
         defaults.setValue(accessToken, forKey: "access_token")
         defaults.setValue(userId, forKey: "user_id")
     }
-    
-//    func navigateToSignIn() {
-//        DispatchQueue.main.async {
-//            if let signInVC = self.storyboard?.instantiateViewController(withIdentifier: "ConfirmRegisterViewController") {
-//                self.navigationController?.pushViewController(signInVC, animated: true)
-//            }
-//        }
-//    }
-    
+
     private func configureTextField(_ textField: UITextField) {
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = UIColor.lightGray.cgColor

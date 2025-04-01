@@ -14,7 +14,7 @@ class FavouritesListViewController: UIViewController, UITableViewDataSource, UIT
     private var allFavouriteSlots: [Slot] = []
     private var currentPageSlots: [Slot] = []
     private var currentPage = 1
-    private let pageSize = 3
+    private let pageSize = 10
     private var isLoading = false
 
     private let prevPageButton: UIButton = {
