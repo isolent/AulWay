@@ -91,6 +91,7 @@ class HomeViewController: UIViewController {
             URLQueryItem(name: "passengers", value: "\(passengers)"),
             URLQueryItem(name: "page", value: "1"),
             URLQueryItem(name: "pageSize", value: "10")
+            
         ]
 
         guard let url = components?.url else {

@@ -8,20 +8,13 @@ class TicketListTableViewCell: UITableViewCell {
     @IBOutlet weak var route: UILabel!
     @IBOutlet weak var favourite: UIButton!
     @IBOutlet weak var date: UILabel!
-    
-    
-    var onFavouriteTapped: (() -> Void)? = nil
-    private var isFavorite: Bool = false
 
-    func updateFavouriteIcon(isFavourite: Bool) {
-        let imageName = isFavourite ? "heart.fill" : "heart"
-        let image = UIImage(systemName: imageName)
-        favourite?.setImage(image, for: .normal)
-    }
+    var onFavouriteTapped: (() -> Void)?
+    private var isFavorite: Bool = false
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        configureCell()
+        configureCellUI()
         favourite?.addTarget(self, action: #selector(favoriteTapped), for: .touchUpInside)
     }
 
@@ -30,7 +23,7 @@ class TicketListTableViewCell: UITableViewCell {
         contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
     }
 
-    private func configureCell() {
+    private func configureCellUI() {
         contentView.layer.cornerRadius = 20
         contentView.layer.masksToBounds = true
         contentView.layer.borderWidth = 1
@@ -41,6 +34,12 @@ class TicketListTableViewCell: UITableViewCell {
 
     @objc private func favoriteTapped() {
         onFavouriteTapped?()
+    }
+
+    func updateFavouriteIcon(isFavourite: Bool) {
+        let imageName = isFavourite ? "heart.fill" : "heart"
+        let image = UIImage(systemName: imageName)
+        favourite?.setImage(image, for: .normal)
     }
 
     func configure(with slot: Slot) {
@@ -54,11 +53,16 @@ class TicketListTableViewCell: UITableViewCell {
         let travelTime = durationFormatter.string(from: slot.start_date, to: slot.end_date) ?? "N/A"
 
         self.route?.text = "\(slot.departure) → \(slot.destination)"
-        self.time.text = "\(timeString)"
+        self.time?.text = timeString
         self.price?.text = "\(slot.price) ₸"
-        self.duration.text = "\(travelTime)"
+        self.duration?.text = travelTime
+        if self.isFavorite == true{
+            updateFavouriteIcon(isFavourite: isFavorite)
+        }
+//        print("\(self.isFavorite)")
         dateFormatter.dateFormat = "d MMM"
         self.date?.text = dateFormatter.string(from: slot.start_date)
+
         self.isFavorite = slot.isFavourite ?? false
         updateFavouriteIcon(isFavourite: isFavorite)
     }

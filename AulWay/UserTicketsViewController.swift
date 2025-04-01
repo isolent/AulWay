@@ -45,12 +45,35 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
         return label
     }()
 
+    private let noTicketsLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.font = UIFont(name: "Avenir Next", size: 24)
+        label.textColor = .white
+        label.numberOfLines = 2
+        label.lineBreakMode = .byWordWrapping
+        label.isHidden = true
+        return label
+    }()
+
+    private let findTicketButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Найти билет", for: .normal)
+        button.backgroundColor = UIColor(white: 1.0, alpha: 0.85)
+        button.setTitleColor(.black, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        button.layer.cornerRadius = 20
+        button.isHidden = true
+        return button
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         tickets.delegate = self
         tickets.dataSource = self
         styleButtons()
         setupPaginationUI()
+        setupEmptyStateUI()
         fetchTickets()
     }
 
@@ -76,6 +99,31 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
         nextPageButton.addTarget(self, action: #selector(nextPageTapped), for: .touchUpInside)
     }
 
+    private func setupEmptyStateUI() {
+        view.addSubview(noTicketsLabel)
+        view.addSubview(findTicketButton)
+
+        noTicketsLabel.translatesAutoresizingMaskIntoConstraints = false
+        findTicketButton.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            noTicketsLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 70),
+            noTicketsLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -70),
+            noTicketsLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -10),
+
+            findTicketButton.topAnchor.constraint(equalTo: noTicketsLabel.bottomAnchor, constant: 20),
+            findTicketButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            findTicketButton.widthAnchor.constraint(equalToConstant: 330),
+            findTicketButton.heightAnchor.constraint(equalToConstant: 40)
+        ])
+
+        findTicketButton.addTarget(self, action: #selector(findTicketTapped), for: .touchUpInside)
+    }
+
+    @objc private func findTicketTapped() {
+        tabBarController?.selectedIndex = 0
+    }
+
     @objc private func prevPageTapped() {
         guard currentPage > 1 else { return }
         currentPage -= 1
@@ -94,15 +142,30 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
         let allTickets = currentTicketType == .past ? allPastTickets : allUpcomingTickets
         let startIndex = (currentPage - 1) * pageSize
         let endIndex = min(startIndex + pageSize, allTickets.count)
+
         if startIndex < endIndex {
             displayedTickets = Array(allTickets[startIndex..<endIndex])
         } else {
             displayedTickets = []
         }
+
+        tickets.isHidden = displayedTickets.isEmpty
+        pageLabel.isHidden = displayedTickets.isEmpty
+        prevPageButton.isHidden = displayedTickets.isEmpty
+        nextPageButton.isHidden = displayedTickets.isEmpty
+
+        noTicketsLabel.isHidden = !displayedTickets.isEmpty
+        findTicketButton.isHidden = !displayedTickets.isEmpty
+
+        if displayedTickets.isEmpty {
+            noTicketsLabel.text = currentTicketType == .upcoming
+                ? "У вас нет никаких предстоящих поездок"
+                : "У вас нет никаких прошлых поездок"
+        }
+
         tickets.reloadData()
         updatePaginationUI()
     }
-
     private func updatePaginationUI() {
         pageLabel.text = "Page \(currentPage)"
         let allTickets = currentTicketType == .past ? allPastTickets : allUpcomingTickets
@@ -186,22 +249,46 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
             return
         }
 
-        let types: [TicketType] = [.past, .upcoming]
-        for type in types {
-            fetchTickets(for: type, userId: userId, token: token)
+        var upcomingFetched = false
+        var pastFetched = false
+
+        let checkAndHandle = {
+            if upcomingFetched && pastFetched {
+                self.updateDisplayedTickets()
+            }
+        }
+
+        fetchTickets(for: .upcoming, userId: userId, token: token) {
+            DispatchQueue.main.async {
+                upcomingFetched = true
+                checkAndHandle()
+            }
+        }
+
+        fetchTickets(for: .past, userId: userId, token: token) {
+            DispatchQueue.main.async {
+                pastFetched = true
+                checkAndHandle()
+            }
         }
     }
 
-    private func fetchTickets(for type: TicketType, userId: String, token: String) {
+    private func fetchTickets(for type: TicketType, userId: String, token: String, completion: @escaping () -> Void) {
         let typeStr = type == .past ? "past" : "upcoming"
         let urlString = "http://localhost:8080/api/tickets/users/\(userId)?type=\(typeStr)"
-        guard let url = URL(string: urlString) else { return }
+        guard let url = URL(string: urlString) else {
+            completion()
+            return
+        }
 
         var request = URLRequest(url: url)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
         URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data else { return }
+            guard let data = data else {
+                completion()
+                return
+            }
 
             do {
                 var fetchedTickets = try JSONDecoder().decode([Ticket].self, from: data)
@@ -223,14 +310,12 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
                     } else {
                         self.allUpcomingTickets = fetchedTickets
                     }
-
-                    if type == self.currentTicketType {
-                        self.currentPage = 1
-                        self.updateDisplayedTickets()
-                    }
+                    completion()
                 }
+
             } catch {
                 print("❌ Ошибка парсинга билетов: \(error)")
+                completion()
             }
         }.resume()
     }

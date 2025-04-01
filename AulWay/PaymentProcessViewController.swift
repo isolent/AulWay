@@ -14,6 +14,7 @@ class PaymentProcessViewController: UIViewController {
     var id: String = ""
     var passengerCount: Int = 1
     var tickets: [Ticket] = []
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,82 +42,81 @@ class PaymentProcessViewController: UIViewController {
     }
    
     private func buyTicket(routeId: String, passengerCount: Int) {
-            guard let url = URL(string: "http://localhost:8080/api/tickets/\(id)") else {
-                showAlert(title: "Ошибка", message: "Неверный URL")
-                return
-            }
+        guard let email = UserDefaults.standard.string(forKey: "email") else {
+            showAlert(title: "Ошибка", message: "Email пользователя не найден в UserDefaults")
+            return
+        }
 
-            guard let authToken = UserDefaults.standard.string(forKey: "access_token") else {
-                showAlert(title: "Ошибка", message: "Отсутствует токен авторизации")
-                return
-            }
-            
-            print("🔑 Токен: \(authToken)")
+        let paymentId = "default-payment-method" // Replace with your actual payment method ID logic if needed
 
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
+        guard let url = URL(string: "http://localhost:8080/api/tickets/\(routeId)?payment_id=\(paymentId)") else {
+            showAlert(title: "Ошибка", message: "Неверный URL")
+            return
+        }
 
-            let requestBody: [String: Any] = [
-                "route_id": routeId,
-                "quantity": passengerCount
-            ]
+        guard let authToken = UserDefaults.standard.string(forKey: "access_token") else {
+            showAlert(title: "Ошибка", message: "Отсутствует токен авторизации")
+            return
+        }
 
-            print("📤 Отправляем данные: \(requestBody)")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
 
-            request.httpBody = try? JSONSerialization.data(withJSONObject: requestBody, options: [])
+        let requestBody: [String: Any] = [
+            "quantity": passengerCount,
+            "user_email": email
+        ]
 
-            let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-                DispatchQueue.main.async {
-                    guard let self = self else { return }
+        request.httpBody = try? JSONSerialization.data(withJSONObject: requestBody, options: [])
 
-                    if let error = error {
-                        self.showAlert(title: "Ошибка", message: "Ошибка сети: \(error.localizedDescription)")
+        print("📤 Отправляем данные: \(requestBody)")
+
+        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+
+                if let error = error {
+                    self.showAlert(title: "Ошибка", message: "Ошибка сети: \(error.localizedDescription)")
+                    return
+                }
+
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    self.showAlert(title: "Ошибка", message: "Некорректный ответ сервера.")
+                    return
+                }
+
+                print("📡 Статус код сервера: \(httpResponse.statusCode)")
+
+                guard (200...299).contains(httpResponse.statusCode) else {
+                    self.navigateToPaymentFailed()
+                    return
+                }
+
+                guard let data = data else {
+                    self.showAlert(title: "Ошибка", message: "Пустой ответ сервера")
+                    return
+                }
+
+                do {
+                    let decodedTickets = try JSONDecoder().decode([Ticket].self, from: data)
+                    self.tickets = decodedTickets
+
+                    if self.tickets.isEmpty {
+                        self.showAlert(title: "Ошибка", message: "Билеты не найдены.")
                         return
                     }
 
-                    guard let httpResponse = response as? HTTPURLResponse else {
-                        self.showAlert(title: "Ошибка", message: "Некорректный ответ сервера.")
-                        return
-                    }
-
-                    print("📡 Статус код сервера: \(httpResponse.statusCode)")
-
-                    guard (200...299).contains(httpResponse.statusCode) else {
-                        
-//                        self.showAlert(title: "Ошибка", message: "Сервер вернул код ошибки: \(httpResponse.statusCode)")
-                        self.navigateToPaymentFailed()
-
-                        return
-                    }
-
-                    guard let data = data else {
-                        self.showAlert(title: "Ошибка", message: "Пустой ответ сервера")
-                        return
-                    }
-
-                    do {
-                        let decodedTickets = try JSONDecoder().decode([Ticket].self, from: data)
-                        self.tickets = decodedTickets
-                        
-                        if self.tickets.isEmpty {
-                            self.showAlert(title: "Ошибка", message: "Билеты не найдены.")
-                            return
-                        }
-                        
-                        self.saveTicketsToUserDefaults()
-                        self.navigateToPaymentConfirmation()
-
-                    } catch {
-//                        self.showAlert(title: "Ошибка", message: "Ошибка при обработке билетов: \(error.localizedDescription)")
-                        
-                        self.navigateToPaymentFailed()
-                    }
+                    self.saveTicketsToUserDefaults()
+                    self.navigateToPaymentConfirmation()
+                } catch {
+                    self.navigateToPaymentFailed()
                 }
             }
-            task.resume()
         }
+        task.resume()
+    }
 
         private func saveTicketsToUserDefaults() {
             do {

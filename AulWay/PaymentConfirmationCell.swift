@@ -8,8 +8,12 @@ class PaymentConfirmationCell: UITableViewCell {
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var routeLabel: UILabel!
 
+    @IBOutlet weak var shareButton: UIButton!
     override func awakeFromNib() {
         super.awakeFromNib()
+        let tap = UITapGestureRecognizer(target: self, action: #selector(shareTapped))
+        shareButton.isUserInteractionEnabled = true
+        shareButton.addGestureRecognizer(tap)
     }
 
     func configure(with ticket: Ticket, slot: Slot?) {
@@ -59,5 +63,37 @@ class PaymentConfirmationCell: UITableViewCell {
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: date)
     }
+    
+    @IBAction func shareTapped(_ sender: Any) {
+        
+        guard let parentVC = findViewController() else {
+            print("❌ Не удалось найти родительский ViewController")
+            return
+        }
+        
+        let pdfData = createPDF(from: self.contentView)
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("ticket_cell.pdf")
+        
+        do {
+            try pdfData.write(to: tempURL)
+            let activityVC = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
+            activityVC.popoverPresentationController?.sourceView = shareButton
+            parentVC.present(activityVC, animated: true)
+        } catch {
+            print("❌ Ошибка при сохранении PDF: \(error)")
+        }
+    }
+}
 
+extension UIView {
+    func findViewController() -> UIViewController? {
+        var responder: UIResponder? = self
+        while responder != nil {
+            if let vc = responder as? UIViewController {
+                return vc
+            }
+            responder = responder?.next
+        }
+        return nil
+    }
 }

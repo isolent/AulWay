@@ -9,7 +9,6 @@ import UIKit
 
 
 class TicketDetailsViewController: UIViewController {
-
     @IBOutlet weak var priceLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var departureLabel: UILabel!
@@ -20,9 +19,14 @@ class TicketDetailsViewController: UIViewController {
     @IBOutlet weak var busNumberLabel: UILabel!
     @IBOutlet weak var shareButton: UIImageView!
     @IBOutlet weak var orderNumberLabel: UILabel!
+    
+    @IBOutlet weak var departureLocationLabel: UILabel!
+    @IBOutlet weak var destinationLocationLabel: UILabel!
+
     var ticketId: String = ""
     var userId: String = ""
 
+    @IBOutlet weak var sixthStackView: UIStackView!
     @IBOutlet weak var fifthStackView: UIStackView!
     @IBOutlet weak var firstStackView: UIStackView!
     @IBOutlet weak var secondStackView: UIStackView!
@@ -68,10 +72,6 @@ class TicketDetailsViewController: UIViewController {
             }
 
             do {
-//                if let json = String(data: data, encoding: .utf8) {
-//                    print("📄 Ticket JSON Response:\n\(json)")
-//                }
-
                 let ticket = try JSONDecoder().decode(Ticket.self, from: data)
                 DispatchQueue.main.async {
                     self.populateTicketUI(ticket: ticket)
@@ -117,6 +117,10 @@ class TicketDetailsViewController: UIViewController {
                     self.arrivalLabel.text = self.formattedTime(slot.end_date)
                     self.pathLabel.text = "\(slot.departure) - \(slot.destination)"
                     self.busNumberLabel.text = slot.carNumber ?? "–"
+                    self.departureLocationLabel.text = slot.departure_location
+                    self.destinationLocationLabel.text = slot.destination_location
+
+                    
 
                     let dateFormatter = DateFormatter()
                     dateFormatter.dateFormat = "dd MMM yyyy"
@@ -132,10 +136,11 @@ class TicketDetailsViewController: UIViewController {
         priceLabel.text = "\(ticket.price) ₸"
         statusLabel.text = ticket.payment_status.capitalized
         orderNumberLabel.text = "\(ticket.order_number)"
+
         
 //        print("📦 Order Number: \(ticket.order_number)")
 
-        qrImageView.backgroundColor = .white
+//        qrImageView.backgroundColor = .white
 
         if !ticket.qr_code.isEmpty {
             DispatchQueue.global(qos: .userInitiated).async {
@@ -180,12 +185,12 @@ class TicketDetailsViewController: UIViewController {
     }
 
     private func setupContainers() {
-        let containers = [firstStackView, secondStackView, thirdStackView, fourthStackView, fifthStackView]
+        let containers = [firstStackView, secondStackView, thirdStackView, fourthStackView, fifthStackView, sixthStackView]
 
         for container in containers {
             container?.translatesAutoresizingMaskIntoConstraints = false
             container?.layer.cornerRadius = 10
-            container?.backgroundColor = UIColor(white: 1.0, alpha: 0.9)
+            container?.backgroundColor = UIColor(white: 1.0, alpha: 0.8)
             container?.clipsToBounds = true
             
             container?.isLayoutMarginsRelativeArrangement = true

@@ -21,7 +21,9 @@ class RouteDetailsViewController: UIViewController {
     @IBOutlet weak var busNumberLabel: UILabel!
     @IBOutlet var departureLabels: [UILabel]!
     @IBOutlet var destinationLabels: [UILabel]!
+    @IBOutlet weak var departure_location: UILabel!
     
+    @IBOutlet weak var destination_location: UILabel!
     var passengerCount: Int = 1
     var selectedSlot: Slot?
     var fromLocation: String = ""
@@ -48,7 +50,7 @@ class RouteDetailsViewController: UIViewController {
             let hours = Int(duration) / 3600
             let minutes = (Int(duration) % 3600) / 60
             routeDuration.text = "\(hours)h \(minutes)m"
-            
+
             if let busNumber = slot.carNumber, !busNumber.isEmpty {
                 busNumberLabel.text = busNumber
             } else {
@@ -56,6 +58,8 @@ class RouteDetailsViewController: UIViewController {
                 busNumberLabel.text = "Не указан"
             }
 
+            departure_location.text = slot.departure_location
+            destination_location.text = slot.destination_location
         }
 
         departureLabels.forEach { $0.text = fromLocation }
@@ -72,6 +76,7 @@ class RouteDetailsViewController: UIViewController {
 
         buyButton.addTarget(self, action: #selector(buyButtonTapped), for: .touchUpInside)
     }
+
 
     @objc func closeView() {
         dismiss(animated: true, completion: nil)

@@ -43,6 +43,7 @@ struct Ticket: Codable {
         paid = try container.decodeIfPresent(Bool.self, forKey: .paid) ?? false
         qrCodeBase64 = try container.decodeIfPresent(String.self, forKey: .qrCodeBase64) ?? ""
         order_number = try container.decode(String.self, forKey: .order_number)
+        
     }
 }
 
@@ -60,6 +61,8 @@ struct Slot: Codable {
     let carNumber: String?
     let availableSeats: Int?
     var isFavourite: Bool?
+    let departure_location: String
+    let destination_location: String
 
     static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -69,8 +72,12 @@ struct Slot: Codable {
     }()
 
     enum CodingKeys: String, CodingKey {
-        case id, departure, destination, start_date, end_date, available_seats, bus_id, price, carNumber = "bus_number",
-             availableSeats = "bus_total_seats", isFavourite
+        case id, departure, destination, start_date, end_date, available_seats, bus_id, price
+        case carNumber = "bus_number"
+        case availableSeats = "bus_total_seats"
+        case isFavourite = "is_favorite"
+        case departure_location = "departure_location"
+        case destination_location = "destination_location"
     }
 
     init(from decoder: Decoder) throws {
@@ -86,6 +93,8 @@ struct Slot: Codable {
         carNumber = try container.decodeIfPresent(String.self, forKey: .carNumber)
         availableSeats = try container.decodeIfPresent(Int.self, forKey: .availableSeats)
         isFavourite = try container.decodeIfPresent(Bool.self, forKey: .isFavourite)
+        departure_location = try container.decode(String.self, forKey: .departure_location)
+        destination_location = try container.decode(String.self, forKey: .destination_location)
         
         let startDateString = try container.decode(String.self, forKey: .start_date)
         let endDateString = try container.decode(String.self, forKey: .end_date)
@@ -112,7 +121,9 @@ struct Slot: Codable {
 //        updated_at: String = "",
         carNumber: String? = nil,
         availableSeats: Int? = nil,
-        isFavourite: Bool? = false
+        isFavourite: Bool? = false,
+        departure_location: String = "unk",
+        destination_location: String = "unk"
     ) {
         self.id = id
         self.departure = departure
@@ -127,6 +138,8 @@ struct Slot: Codable {
         self.carNumber = carNumber
         self.availableSeats = availableSeats
         self.isFavourite = isFavourite
+        self.departure_location = departure_location
+        self.destination_location = destination_location
     }
 
     static func defaultSlot() -> Slot {

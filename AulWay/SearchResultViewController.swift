@@ -184,55 +184,52 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+
         let cell = tableView.dequeueReusableCell(withIdentifier: "TicketListTableViewCell", for: indexPath) as! TicketListTableViewCell
-        var slot = slotList[indexPath.row]
 
+        let slot = slotList[indexPath.row]
         cell.configure(with: slot)
-
         cell.updateFavouriteIcon(isFavourite: slot.isFavourite ?? false)
-        
+
         cell.onFavouriteTapped = {
-            let routeId = slot.id
+            guard let globalIndex = self.allSlots.firstIndex(where: { $0.id == slot.id }) else { return }
 
             if slot.isFavourite == true {
-                self.removeFromFavourites(routeId: routeId)
-                slot.isFavourite = false
-                cell.updateFavouriteIcon(isFavourite: false)
+                self.removeFromFavourites(routeId: slot.id) { success in
+                    guard success else { return }
+                    self.allSlots[globalIndex].isFavourite = false
+                    self.slotList[indexPath.row].isFavourite = false
+                    DispatchQueue.main.async {
+                        tableView.reloadRows(at: [indexPath], with: .automatic)
+                    }
+                }
             } else {
-                self.addToFavourites(routeId: routeId)
-                slot.isFavourite = true
-                cell.updateFavouriteIcon(isFavourite: true)
+                self.addToFavourites(routeId: slot.id) { success in
+                    guard success else { return }
+                    self.allSlots[globalIndex].isFavourite = true
+                    self.slotList[indexPath.row].isFavourite = true
+                    DispatchQueue.main.async {
+                        tableView.reloadRows(at: [indexPath], with: .automatic)
+                    }
+                }
             }
         }
-
-
         return cell
     }
 
 
-    private func formattedTimeRange(for slot: Slot) -> String {
-        let df = DateFormatter()
-        df.dateFormat = "HH:mm"
-        return "\(df.string(from: slot.start_date)) - \(df.string(from: slot.end_date))"
-    }
-
-    private func formattedDuration(for slot: Slot) -> String {
-        let df = DateComponentsFormatter()
-        df.unitsStyle = .abbreviated
-        df.allowedUnits = [.hour, .minute]
-        return df.string(from: slot.start_date, to: slot.end_date) ?? "N/A"
-    }
-
-    private func addToFavourites(routeId: String) {
+    private func addToFavourites(routeId: String, completion: @escaping (Bool) -> Void) {
         guard let userId = UserDefaults.standard.string(forKey: "user_id"),
               let token = UserDefaults.standard.string(forKey: "authToken") else {
             print("❌ No user ID or token found")
+            completion(false)
             return
         }
 
         let urlString = "http://localhost:8080/api/users/\(userId)/favorites"
         guard let url = URL(string: urlString) else {
             print("❌ Invalid URL")
+            completion(false)
             return
         }
 
@@ -247,22 +244,26 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("❌ Favorite add error: \(error.localizedDescription)")
+                completion(false)
                 return
             }
             print("❤️ Route \(routeId) added to favorites.")
+            completion(true)
         }.resume()
     }
-    
-    private func removeFromFavourites(routeId: String) {
+
+    private func removeFromFavourites(routeId: String, completion: @escaping (Bool) -> Void) {
         guard let userId = UserDefaults.standard.string(forKey: "user_id"),
               let token = UserDefaults.standard.string(forKey: "authToken") else {
             print("❌ No user ID or token found")
+            completion(false)
             return
         }
 
         let urlString = "http://localhost:8080/api/users/\(userId)/favorites/\(routeId)"
         guard let url = URL(string: urlString) else {
             print("❌ Invalid URL")
+            completion(false)
             return
         }
 
@@ -274,17 +275,21 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("❌ Error removing favorite: \(error.localizedDescription)")
+                completion(false)
             } else {
                 print("🗑️ Removed route \(routeId) from favorites.")
+                completion(true)
             }
         }.resume()
     }
+
 
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         ticketsTableView.deselectRow(at: indexPath, animated: true)
 
         let selectedSlot = slotList[indexPath.row]
+        let globalIndex = allSlots.firstIndex { $0.id == selectedSlot.id }
 
         if let detailsVC = storyboard?.instantiateViewController(withIdentifier: "RouteDetailsViewController") as? RouteDetailsViewController {
             detailsVC.selectedSlot = selectedSlot
@@ -294,5 +299,18 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
             detailsVC.passengerCount = passengerCount
             present(detailsVC, animated: true)
         }
+    }
+    
+    private func formattedTimeRange(for slot: Slot) -> String {
+        let df = DateFormatter()
+        df.dateFormat = "HH:mm"
+        return "\(df.string(from: slot.start_date)) - \(df.string(from: slot.end_date))"
+    }
+
+    private func formattedDuration(for slot: Slot) -> String {
+        let df = DateComponentsFormatter()
+        df.unitsStyle = .abbreviated
+        df.allowedUnits = [.hour, .minute]
+        return df.string(from: slot.start_date, to: slot.end_date) ?? "N/A"
     }
 }
