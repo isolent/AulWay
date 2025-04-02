@@ -23,12 +23,21 @@ class ResultNFViewController: UIViewController {
         pathLabel.text = path
         dateLabel.text = dateInfo
 
-        let backButton = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(backButtonTapped))
-        navigationItem.leftBarButtonItem = backButton
+        let backButton = UIButton(type: .system)
+        backButton.setTitle("Back", for: .normal)
+        backButton.setTitleColor(.systemBlue, for: .normal)
+        backButton.titleLabel?.font = .systemFont(ofSize: 17)
+        backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+
+        let barButtonItem = UIBarButtonItem(customView: backButton)
+        navigationItem.leftBarButtonItem = barButtonItem
+
+
     }
 
     @objc func backButtonTapped() {
-        navigationController?.popViewController(animated: true)
+        tabBarController?.selectedIndex = 0
+        navigationController?.popToRootViewController(animated: true)
     }
     
 }

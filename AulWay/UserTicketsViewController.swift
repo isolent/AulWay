@@ -75,12 +75,20 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
         setupPaginationUI()
         setupEmptyStateUI()
         fetchTickets()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadTicketsAfterCancel), name: NSNotification.Name("TicketCancelled"), object: nil)
+
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         fetchTickets()
     }
+    
+    @objc private func reloadTicketsAfterCancel() {
+        fetchTickets()
+    }
+
 
     private func setupPaginationUI() {
         let stackView = UIStackView(arrangedSubviews: [prevPageButton, pageLabel, nextPageButton])
@@ -194,9 +202,18 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
         timeFormatter.dateFormat = "HH:mm"
         cell.Time.text = "\(timeFormatter.string(from: ticket.slot.start_date)) - \(timeFormatter.string(from: ticket.slot.end_date))"
 
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: ticket.slot.start_date, to: ticket.slot.end_date)
+
+        let hours = components.hour ?? 0
+        let minutes = components.minute ?? 0
+        cell.Duration.text = "\(hours)h \(minutes)m"
+
+
         cell.Path.text = "\(ticket.slot.departure) - \(ticket.slot.destination)"
         cell.Status.text = "Paid"
         cell.CarNumber.text = ticket.slot.carNumber ?? "-"
+
 
         return cell
     }
@@ -208,6 +225,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
         if let ticketDetailsVC = storyboard.instantiateViewController(withIdentifier: "TicketDetailsViewController") as? TicketDetailsViewController {
             ticketDetailsVC.ticketId = ticket.id
             ticketDetailsVC.userId = ticket.user_id
+            ticketDetailsVC.ticket = ticket
             self.navigationController?.pushViewController(ticketDetailsVC, animated: true)
         }
     }
@@ -292,6 +310,12 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
 
             do {
                 var fetchedTickets = try JSONDecoder().decode([Ticket].self, from: data)
+                
+                fetchedTickets = fetchedTickets.filter {
+                    $0.status.lowercased() != "cancelled" &&
+                    $0.payment_status.lowercased() != "refunded"
+                }
+                
                 let group = DispatchGroup()
 
                 for i in 0..<fetchedTickets.count {

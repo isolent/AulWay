@@ -25,6 +25,9 @@ class TicketDetailsViewController: UIViewController {
 
     var ticketId: String = ""
     var userId: String = ""
+    var ticket: Ticket?
+    var startDate: Date?
+
 
     @IBOutlet weak var sixthStackView: UIStackView!
     @IBOutlet weak var fifthStackView: UIStackView!
@@ -70,7 +73,7 @@ class TicketDetailsViewController: UIViewController {
                 print("❌ No ticket data received")
                 return
             }
-
+            print("Ticket id: \(self.ticketId)")
             do {
                 let ticket = try JSONDecoder().decode(Ticket.self, from: data)
                 DispatchQueue.main.async {
@@ -131,6 +134,49 @@ class TicketDetailsViewController: UIViewController {
             }
         }.resume()
     }
+    
+    private func cancelTicket() {
+        guard let token = UserDefaults.standard.string(forKey: "access_token") else {
+            showAlert(title: "Ошибка", message: "Токен не найден")
+            return
+        }
+
+        let urlString = "http://localhost:8080/api/tickets/users/\(userId)/\(ticketId)/cancel"
+        guard let url = URL(string: urlString) else {
+            showAlert(title: "Ошибка", message: "Неверный URL")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    self.showAlert(title: "Ошибка", message: "Ошибка сети: \(error.localizedDescription)")
+                    return
+                }
+
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    self.showAlert(title: "Ошибка", message: "Некорректный ответ сервера.")
+                    return
+                }
+
+                if httpResponse.statusCode == 200 {
+                    self.showAlert(title: "Успешно", message: "Билет отменён.") {
+                        self.navigateToUserTickets()
+                        NotificationCenter.default.post(name:       NSNotification.Name("TicketCancelled"), object: nil)
+
+                    }
+                } else {
+                    self.showAlert(title: "Ошибка", message: "Не удалось отменить билет.")
+                }
+            }
+        }.resume()
+    }
+
 
     private func populateTicketUI(ticket: Ticket) {
         priceLabel.text = "\(ticket.price) ₸"
@@ -205,6 +251,30 @@ class TicketDetailsViewController: UIViewController {
             view.layer.render(in: context.cgContext)
         }
     }
+    
+    @IBAction func cancelTicketTapped(_ sender: UIButton) {
+        guard let ticket = ticket else { return }
+
+        if ticket.slot.start_date < Date() {
+            showAlert(title: "Нельзя отменить", message: "Вы не можете отменить прошедший билет.")
+            return
+        }
+
+        let alert = UIAlertController(
+            title: "Отмена билета",
+            message: "Вы уверены, что хотите отменить билет?",
+            preferredStyle: .alert
+        )
+
+        alert.addAction(UIAlertAction(title: "Отменить", style: .destructive) { _ in
+            self.cancelTicket()
+        })
+
+        alert.addAction(UIAlertAction(title: "Нет", style: .cancel))
+
+        present(alert, animated: true)
+    }
+
 
     @objc private func shareTapped() {
         
@@ -218,6 +288,30 @@ class TicketDetailsViewController: UIViewController {
             present(activityVC, animated: true)
         } catch {
             print("❌ Failed to write PDF: \(error)")
+        }
+    }
+    
+    private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+            completion?()
+        })
+        present(alert, animated: true)
+    }
+    
+    private func navigateToUserTickets() {
+        if let nav = self.navigationController {
+            for vc in nav.viewControllers {
+                if vc is UserTicketsViewController {
+                    nav.popToViewController(vc, animated: true)
+                    return
+                }
+            }
+
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            if let userTicketsVC = storyboard.instantiateViewController(withIdentifier: "UserTicketsViewController") as? UserTicketsViewController {
+                nav.setViewControllers([userTicketsVC], animated: true)
+            }
         }
     }
 }

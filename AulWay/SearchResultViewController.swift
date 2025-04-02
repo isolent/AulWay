@@ -319,12 +319,6 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
         return "\(df.string(from: slot.start_date)) - \(df.string(from: slot.end_date))"
     }
 
-    private func formattedDuration(for slot: Slot) -> String {
-        let df = DateComponentsFormatter()
-        df.unitsStyle = .abbreviated
-        df.allowedUnits = [.hour, .minute]
-        return df.string(from: slot.start_date, to: slot.end_date) ?? "N/A"
-    }
     
     @objc func backButtonTapped() {
         tabBarController?.selectedIndex = 0

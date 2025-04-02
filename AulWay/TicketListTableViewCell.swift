@@ -43,27 +43,25 @@ class TicketListTableViewCell: UITableViewCell {
     }
 
     func configure(with slot: Slot) {
+
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "HH:mm"
         let timeString = "\(dateFormatter.string(from: slot.start_date)) - \(dateFormatter.string(from: slot.end_date))"
+        time.text = timeString
 
-        let durationFormatter = DateComponentsFormatter()
-        durationFormatter.unitsStyle = .abbreviated
-        durationFormatter.allowedUnits = [.hour, .minute]
-        let travelTime = durationFormatter.string(from: slot.start_date, to: slot.end_date) ?? "N/A"
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: slot.start_date, to: slot.end_date)
+        let hours = components.hour ?? 0
+        let minutes = components.minute ?? 0
+        duration.text = "\(hours)h \(minutes)m"
 
-        self.route?.text = "\(slot.departure) → \(slot.destination)"
-        self.time?.text = timeString
-        self.price?.text = "\(slot.price) ₸"
-        self.duration?.text = travelTime
-        if self.isFavorite == true{
-            updateFavouriteIcon(isFavourite: isFavorite)
-        }
-//        print("\(self.isFavorite)")
+        route.text = "\(slot.departure) → \(slot.destination)"
+        price.text = "\(slot.price) ₸"
+
         dateFormatter.dateFormat = "d MMM"
         self.date?.text = dateFormatter.string(from: slot.start_date)
 
-        self.isFavorite = slot.isFavourite ?? false
+        isFavorite = slot.isFavourite ?? false
         updateFavouriteIcon(isFavourite: isFavorite)
     }
 }
