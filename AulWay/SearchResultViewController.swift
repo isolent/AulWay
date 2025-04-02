@@ -56,9 +56,17 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
         setupPaginationUI()
         fetchTickets()
         
-        navigationItem.hidesBackButton = true
-        let backButton = UIBarButtonItem(title: "← Back", style: .plain, target: self, action: #selector(backButtonTapped))
-        navigationItem.leftBarButtonItem = backButton
+        navigationItem.hidesBackButton = false
+        
+        let backButton = UIButton(type: .system)
+        backButton.setTitle("Back", for: .normal)
+        backButton.setTitleColor(.systemBlue, for: .normal)
+        backButton.titleLabel?.font = .systemFont(ofSize: 17)
+        backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+
+        let barButtonItem = UIBarButtonItem(customView: backButton)
+        navigationItem.leftBarButtonItem = barButtonItem
+
 
     }
 
