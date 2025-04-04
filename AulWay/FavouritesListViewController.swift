@@ -110,7 +110,7 @@ class FavouritesListViewController: UIViewController, UITableViewDataSource, UIT
             return
         }
 
-        let urlString = "http://localhost:8080/api/users/\(userId)/favorites"
+        let urlString = "\(BASE_URL)/api/users/\(userId)/favorites"
         guard let url = URL(string: urlString) else {
             print("❌ Invalid URL")
             return

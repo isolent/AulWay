@@ -54,7 +54,7 @@ class ProfileViewController: UIViewController {
             return
         }
 
-        let url = URL(string: "http://localhost:8080/api/users/\(userId)")!
+        let url = URL(string: "\(BASE_URL)/api/users/\(userId)")!
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
         request.httpMethod = "GET"
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")

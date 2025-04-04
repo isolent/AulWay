@@ -30,7 +30,7 @@ class PrivacySecurityViewController: UIViewController {
             return
         }
 
-        let urlString = "http://localhost:8080/api/pages/privacy_policy"
+        let urlString = "\(BASE_URL)/api/pages/privacy_policy"
         guard let url = URL(string: urlString) else {
             print("❌ Invalid URL")
             return

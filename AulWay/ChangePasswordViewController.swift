@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ChangePasswordViewController: UIViewController {
+class ChangePasswordViewController: BaseViewController {
 
     @IBOutlet weak var currentPasswordTextField: UITextField!
     @IBOutlet weak var newPasswordTextField: UITextField!
@@ -80,7 +80,7 @@ class ChangePasswordViewController: UIViewController {
     }
 
     private func sendChangePasswordRequest(userId: String, email: String, oldPassword: String, newPassword: String, token: String) {
-        let urlString = "http://localhost:8080/api/users/\(userId)/change-password"
+        let urlString = "\(BASE_URL)/api/users/\(userId)/change-password"
         guard let url = URL(string: urlString) else {
             showAlert(title: "Ошибка", message: "Неверный адрес сервера.")
             return

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class VerifyViewController: UIViewController {
+class VerifyViewController: BaseViewController {
 
     @IBOutlet weak var emailLabel: UILabel!
     @IBOutlet weak var codeTextField: UITextField!
@@ -19,6 +19,10 @@ class VerifyViewController: UIViewController {
         super.viewDidLoad()
         emailLabel.text = email
         configureTextField(codeTextField)
+//        func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+//            textField.resignFirstResponder()
+//            return true
+//        }
     }
 
     @IBAction func verifyTapped(_ sender: UIButton) {
@@ -27,7 +31,7 @@ class VerifyViewController: UIViewController {
     }
 
     func sendVerification(code: String, email: String, password: String) {
-        guard let url = URL(string: "http://localhost:8080/auth/signup/verify") else { return }
+        guard let url = URL(string: "\(BASE_URL)/auth/signup/verify") else { return }
 
         let body: [String: String] = [
             "code": code,

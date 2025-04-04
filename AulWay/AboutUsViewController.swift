@@ -30,7 +30,7 @@ class AboutUsViewController: UIViewController {
             return
         }
 
-        let urlString = "http://localhost:8080/api/pages/about_us"
+        let urlString = "\(BASE_URL)/api/pages/about_us"
         guard let url = URL(string: urlString) else {
             print("❌ Invalid URL")
             return

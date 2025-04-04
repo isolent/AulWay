@@ -35,7 +35,7 @@ class DeleteAccountViewController: UIViewController {
             return
         }
 
-        let urlString = "http://localhost:8080/api/users/\(userId)"
+        let urlString = "\(BASE_URL)/api/users/\(userId)"
         guard let url = URL(string: urlString) else {
             showAlert(title: "Ошибка", message: "Некорректный URL.")
             return

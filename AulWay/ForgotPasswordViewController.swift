@@ -28,7 +28,7 @@ class ForgotPasswordViewController: UIViewController {
     }
 
     private func sendForgotPasswordRequest(email: String) {
-        guard let url = URL(string: "http://localhost:8080/auth/forgot-password") else { return }
+        guard let url = URL(string: "\(BASE_URL)/auth/forgot-password") else { return }
 
         let body: [String: String] = ["email": email]
         var request = URLRequest(url: url)

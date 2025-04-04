@@ -7,7 +7,7 @@
 
 import UIKit
 
-class VerifyForgotPasswordViewController: UIViewController {
+class VerifyForgotPasswordViewController: BaseViewController {
 
     @IBOutlet weak var emailLabel: UILabel!
     @IBOutlet weak var codeTextField: UITextField!
@@ -23,6 +23,10 @@ class VerifyForgotPasswordViewController: UIViewController {
         configureTextField(codeTextField)
         configureTextField(newPasswordTextField)
         configureTextField(confirmPasswordTextField)
+//        func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+//            textField.resignFirstResponder()
+//            return true
+//        }
     }
 
     @IBAction func resetPasswordTapped(_ sender: UIButton) {
@@ -44,7 +48,7 @@ class VerifyForgotPasswordViewController: UIViewController {
     }
 
     private func sendResetRequest(code: String, email: String, newPassword: String) {
-        guard let url = URL(string: "http://localhost:8080/auth/forgot-password/verify") else { return }
+        guard let url = URL(string: "\(BASE_URL)/auth/forgot-password/verify") else { return }
 
         let body: [String: String] = [
             "code": code,

@@ -53,7 +53,7 @@ class TicketDetailsViewController: UIViewController {
             return
         }
 
-        let urlString = "http://localhost:8080/api/tickets/users/\(userId)/\(ticketId)"
+        let urlString = "\(BASE_URL)/api/tickets/users/\(userId)/\(ticketId)"
         guard let url = URL(string: urlString) else {
             print("❌ Invalid ticket details URL")
             return
@@ -89,7 +89,7 @@ class TicketDetailsViewController: UIViewController {
     private func fetchRouteDetails(routeId: String) {
         guard let token = UserDefaults.standard.string(forKey: "access_token") else { return }
 
-        let urlString = "http://localhost:8080/api/routes/\(routeId)"
+        let urlString = "\(BASE_URL)/api/routes/\(routeId)"
         guard let url = URL(string: urlString) else {
             print("❌ Invalid route URL")
             return
@@ -141,7 +141,7 @@ class TicketDetailsViewController: UIViewController {
             return
         }
 
-        let urlString = "http://localhost:8080/api/tickets/users/\(userId)/\(ticketId)/cancel"
+        let urlString = "\(BASE_URL)/api/tickets/users/\(userId)/\(ticketId)/cancel"
         guard let url = URL(string: urlString) else {
             showAlert(title: "Ошибка", message: "Неверный URL")
             return

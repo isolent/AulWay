@@ -232,7 +232,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
 
     @IBAction func switchTicketType(_ sender: UIButton) {
         currentTicketType = sender == upcomingButton ? .upcoming : .past
-        updateButtonStyles()
+            updateButtonStyles()
         currentPage = 1
         updateDisplayedTickets()
     }
@@ -293,7 +293,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
 
     private func fetchTickets(for type: TicketType, userId: String, token: String, completion: @escaping () -> Void) {
         let typeStr = type == .past ? "past" : "upcoming"
-        let urlString = "http://localhost:8080/api/tickets/users/\(userId)?type=\(typeStr)"
+        let urlString = "\(BASE_URL)/api/tickets/users/\(userId)?type=\(typeStr)"
         guard let url = URL(string: urlString) else {
             completion()
             return
@@ -345,7 +345,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
     }
 
     private func fetchSlot(for routeId: String, token: String, completion: @escaping (Slot?) -> Void) {
-        let urlString = "http://localhost:8080/api/routes/\(routeId)"
+        let urlString = "\(BASE_URL)/api/routes/\(routeId)"
         guard let url = URL(string: urlString) else {
             completion(nil)
             return

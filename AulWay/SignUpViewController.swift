@@ -7,14 +7,13 @@
 
 import UIKit
 
-class SignUpViewController: UIViewController {
+class SignUpViewController: BaseViewController {
     
     @IBOutlet weak var signInButton: UIButton!
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var confPassTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var signUpButton: UIButton!
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,15 +23,22 @@ class SignUpViewController: UIViewController {
         configureButton(signUpButton)
     }
     
-    @IBAction func signUpTapped(_ sender: UIButton){
-        guard let email = emailTextField.text,
-              let password = passwordTextField.text else { return }
+    @IBAction func signUpTapped(_ sender: UIButton) {
+        guard let email = emailTextField.text, !email.isEmpty,
+              let password = passwordTextField.text, !password.isEmpty else {
+            showAlert(title: "Ошибка", message: "Введите email и пароль")
+            return
+        }
 
         registerUser(email: email, password: password)
     }
     
     private func registerUser(email: String, password: String) {
-        let url = URL(string: "http://localhost:8080/auth/signup")!
+        guard let url = URL(string: "\(BASE_URL)/auth/signup") else {
+            print("❌ Invalid URL")
+            return
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -41,55 +47,84 @@ class SignUpViewController: UIViewController {
         request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let httpResponse = response as? HTTPURLResponse {
+//                print("📡 Server responded with code: \(httpResponse.statusCode)")
+            }
+
             guard let data = data, error == nil else {
                 print("❌ Network error: \(error?.localizedDescription ?? "Unknown error")")
+                DispatchQueue.main.async {
+                    self.showAlert(title: "Ошибка", message: "Проблема с сетью. Повторите попытку.")
+                }
                 return
             }
-            
+
             do {
                 if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                    
-                    if let errorMessage = jsonResponse["errDesc"] as? String, errorMessage == "email already exists" {
-                        print("⚠️ Email already registered. Redirecting to UserExistsViewController.")
+//                    print("📦 Full JSON Response: \(jsonResponse)")
+
+                    if let errorMessage = jsonResponse["errDesc"] as? String,
+                       errorMessage.lowercased().contains("email already exists") {
+//                        print("⚠️ Email already registered. Navigating to UserExistsViewController.")
                         DispatchQueue.main.async {
                             self.navigateToUserExists()
                         }
                         return
                     }
 
-                    let accessToken = jsonResponse["access_token"] as? String
-                    let userDict = jsonResponse["user"] as? [String: Any]
-                    let userId = userDict?["id"] as? String
 
-                    if let accessToken = accessToken, let userId = userId {
-                        print("✅ Successfully signed up!")
-                        print("🔑 Token: \(accessToken)")
-                        print("🆔 User ID: \(userId)")
-                        
-                        self.saveUserSession(accessToken: accessToken, userId: userId)
+                    if let message = jsonResponse["message"] as? String {
+                        print("✅ \(message)")
 
                         DispatchQueue.main.async {
-                            if let verifyVC = self.storyboard?.instantiateViewController(withIdentifier: "VerifyViewController") as? VerifyViewController {
-                                verifyVC.email = email
-                                verifyVC.password = password
-                                self.navigationController?.pushViewController(verifyVC, animated: true)
+                            guard let verifyVC = self.storyboard?.instantiateViewController(withIdentifier: "VerifyViewController") as? VerifyViewController else {
+                                print("❌ Could not load VerifyViewController")
+                                return
                             }
+                            verifyVC.email = email
+                            verifyVC.password = password
+
+                            if let nav = self.navigationController {
+                                nav.pushViewController(verifyVC, animated: true)
+                            } else {
+                                verifyVC.modalPresentationStyle = .fullScreen
+                                self.present(verifyVC, animated: true, completion: nil)
+                            }
+                        }
+                    } else {
+                        print("⚠️ 'message' not found in response.")
+                        DispatchQueue.main.async {
+                            self.showAlert(title: "Ошибка", message: "Не удалось завершить регистрацию.")
                         }
                     }
                 } else {
-                    print("❌ Failed to parse JSON into dictionary.")
+                    print("❌ Invalid JSON structure.")
+                    DispatchQueue.main.async {
+                        self.showAlert(title: "Ошибка", message: "Неверный ответ от сервера.")
+                    }
                 }
             } catch {
                 print("❌ JSON Parsing Error: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self.showAlert(title: "Ошибка", message: "Ошибка при обработке ответа сервера.")
+                }
             }
         }
         task.resume()
     }
 
+
     func navigateToUserExists() {
         DispatchQueue.main.async {
             if let userExistsVC = self.storyboard?.instantiateViewController(withIdentifier: "UserExistsViewController") {
-                self.navigationController?.pushViewController(userExistsVC, animated: true)
+                if let nav = self.navigationController {
+                    nav.pushViewController(userExistsVC, animated: true)
+                } else {
+                    userExistsVC.modalPresentationStyle = .fullScreen
+                    self.present(userExistsVC, animated: true, completion: nil)
+                }
+            } else {
+                print("❌ Could not load UserExistsViewController")
             }
         }
     }
@@ -119,5 +154,11 @@ class SignUpViewController: UIViewController {
         button.layer.borderColor = UIColor.lightGray.cgColor
         button.layer.cornerRadius = button.frame.height / 2
         button.clipsToBounds = true
+    }
+
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "ОК", style: .default))
+        present(alert, animated: true)
     }
 }

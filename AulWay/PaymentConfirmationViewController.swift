@@ -77,7 +77,7 @@ class PaymentConfirmationViewController: UIViewController, UITableViewDelegate, 
             return
         }
 
-        let urlString = "http://localhost:8080/api/routes/\(routeId)"
+        let urlString = "\(BASE_URL)/api/routes/\(routeId)"
         guard let url = URL(string: urlString) else {
             print("❌ Invalid URL")
             return

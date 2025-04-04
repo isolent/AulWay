@@ -1,6 +1,6 @@
 import UIKit
 
-class SearchResultViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class SearchResultViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
 
     @IBOutlet weak var ticketsTableView: UITableView!
     @IBOutlet weak var Path: UILabel!
@@ -46,7 +46,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         Path.text = "\(fromLocation) → \(toLocation)"
         DateInfo.text = DateFormatter.localizedString(from: travelDate, dateStyle: .medium, timeStyle: .none)
 
@@ -115,7 +115,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
             return
         }
 
-        let urlString = "http://localhost:8080/api/routes?departure=\(fromEncoded)&destination=\(toEncoded)&date=\(dateString)&passengers=\(passengerCount)"
+        let urlString = "\(BASE_URL)/api/routes?departure=\(fromEncoded)&destination=\(toEncoded)&date=\(dateString)&passengers=\(passengerCount)"
         guard let url = URL(string: urlString) else { return }
 
         var request = URLRequest(url: url)
@@ -239,7 +239,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
             return
         }
 
-        let urlString = "http://localhost:8080/api/users/\(userId)/favorites"
+        let urlString = "\(BASE_URL)/api/users/\(userId)/favorites"
         guard let url = URL(string: urlString) else {
             print("❌ Invalid URL")
             completion(false)
@@ -273,7 +273,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
             return
         }
 
-        let urlString = "http://localhost:8080/api/users/\(userId)/favorites/\(routeId)"
+        let urlString = "\(BASE_URL)/api/users/\(userId)/favorites/\(routeId)"
         guard let url = URL(string: urlString) else {
             print("❌ Invalid URL")
             completion(false)

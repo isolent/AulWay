@@ -7,7 +7,7 @@
 
 import UIKit
 
-class HomeViewController: UIViewController {
+class HomeViewController: BaseViewController {
     
     @IBOutlet weak var From: UITextField!
     @IBOutlet weak var To: UITextField!
@@ -26,6 +26,10 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+            textField.resignFirstResponder()
+            return true
+        }
     }
     
     func setupUI() {
@@ -79,7 +83,7 @@ class HomeViewController: UIViewController {
     }
     
     func fetchTickets(departure: String, destination: String, date: Date, passengers: Int) {
-        let baseURL = "http://localhost:8080/api/routes"
+        let baseURL = "\(BASE_URL)/api/routes"
         var components = URLComponents(string: baseURL)
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"

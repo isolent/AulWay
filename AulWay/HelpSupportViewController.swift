@@ -30,7 +30,7 @@ class HelpSupportViewController: UIViewController {
             return
         }
 
-        let urlString = "http://localhost:8080/api/pages/help_support"
+        let urlString = "\(BASE_URL)/api/pages/help_support"
         guard let url = URL(string: urlString) else {
             print("❌ Invalid URL")
             return

@@ -11,7 +11,6 @@ class RouteDetailsViewController: UIViewController {
 
     @IBOutlet weak var availableSeatNumber: UILabel!
     @IBOutlet weak var closeButton: UIImageView!
-    @IBOutlet weak var shareButton: UIImageView!
     @IBOutlet weak var buyButton: UIButton!
     @IBOutlet weak var priceLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!

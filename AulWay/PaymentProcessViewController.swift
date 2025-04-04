@@ -1,6 +1,6 @@
 import UIKit
 
-class PaymentProcessViewController: UIViewController {
+class PaymentProcessViewController: BaseViewController {
     
     @IBOutlet weak var phoneNumberTextField: UITextField!
     @IBOutlet weak var emailTextField: UITextField!
@@ -49,7 +49,7 @@ class PaymentProcessViewController: UIViewController {
 
         let paymentId = "default-payment-method" // Replace with your actual payment method ID logic if needed
 
-        guard let url = URL(string: "http://localhost:8080/api/tickets/\(routeId)?payment_id=\(paymentId)") else {
+        guard let url = URL(string: "\(BASE_URL)/api/tickets/\(routeId)?payment_id=\(paymentId)") else {
             showAlert(title: "Ошибка", message: "Неверный URL")
             return
         }
