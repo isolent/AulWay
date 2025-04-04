@@ -14,6 +14,8 @@ class PaymentProcessViewController: BaseViewController {
     var id: String = ""
     var passengerCount: Int = 1
     var tickets: [Ticket] = []
+    var paymentId: String = "pm_card_visa"
+
     
 
     override func viewDidLoad() {
@@ -47,7 +49,7 @@ class PaymentProcessViewController: BaseViewController {
             return
         }
 
-        let paymentId = "default-payment-method" // Replace with your actual payment method ID logic if needed
+        let paymentId = "pm_card_visa"
 
         guard let url = URL(string: "\(BASE_URL)/api/tickets/\(routeId)?payment_id=\(paymentId)") else {
             showAlert(title: "Ошибка", message: "Неверный URL")

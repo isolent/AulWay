@@ -7,5 +7,5 @@
 
 import Foundation
 
-let BASE_URL = "http://192.168.10.12:8080"
+let BASE_URL = "http://localhost:8080"
 

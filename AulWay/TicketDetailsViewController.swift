@@ -135,58 +135,14 @@ class TicketDetailsViewController: UIViewController {
         }.resume()
     }
     
-    private func cancelTicket() {
-        guard let token = UserDefaults.standard.string(forKey: "access_token") else {
-            showAlert(title: "Ошибка", message: "Токен не найден")
-            return
-        }
-
-        let urlString = "\(BASE_URL)/api/tickets/users/\(userId)/\(ticketId)/cancel"
-        guard let url = URL(string: urlString) else {
-            showAlert(title: "Ошибка", message: "Неверный URL")
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    self.showAlert(title: "Ошибка", message: "Ошибка сети: \(error.localizedDescription)")
-                    return
-                }
-
-                guard let httpResponse = response as? HTTPURLResponse else {
-                    self.showAlert(title: "Ошибка", message: "Некорректный ответ сервера.")
-                    return
-                }
-
-                if httpResponse.statusCode == 200 {
-                    self.showAlert(title: "Успешно", message: "Билет отменён.") {
-                        self.navigateToUserTickets()
-                        NotificationCenter.default.post(name:       NSNotification.Name("TicketCancelled"), object: nil)
-
-                    }
-                } else {
-                    self.showAlert(title: "Ошибка", message: "Не удалось отменить билет.")
-                }
-            }
-        }.resume()
-    }
-
 
     private func populateTicketUI(ticket: Ticket) {
         priceLabel.text = "\(ticket.price) ₸"
         statusLabel.text = ticket.payment_status.capitalized
         orderNumberLabel.text = "\(ticket.order_number)"
-
         
 //        print("📦 Order Number: \(ticket.order_number)")
 
-//        qrImageView.backgroundColor = .white
 
         if !ticket.qr_code.isEmpty {
             DispatchQueue.global(qos: .userInitiated).async {
@@ -255,26 +211,18 @@ class TicketDetailsViewController: UIViewController {
     @IBAction func cancelTicketTapped(_ sender: UIButton) {
         guard let ticket = ticket else { return }
 
-        if ticket.slot.start_date < Date() {
-            showAlert(title: "Нельзя отменить", message: "Вы не можете отменить прошедший билет.")
-            return
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        if let refundVC = storyboard.instantiateViewController(withIdentifier: "TicketRefundViewController") as? TicketRefundViewController {
+            refundVC.ticket = ticket
+            refundVC.userId = self.userId
+
+            let navController = UINavigationController(rootViewController: refundVC)
+            navController.modalPresentationStyle = .fullScreen
+            present(navController, animated: true)
         }
-
-        let alert = UIAlertController(
-            title: "Отмена билета",
-            message: "Вы уверены, что хотите отменить билет?",
-            preferredStyle: .alert
-        )
-
-        alert.addAction(UIAlertAction(title: "Отменить", style: .destructive) { _ in
-            self.cancelTicket()
-        })
-
-        alert.addAction(UIAlertAction(title: "Нет", style: .cancel))
-
-        present(alert, animated: true)
     }
 
+    
 
     @objc private func shareTapped() {
         
