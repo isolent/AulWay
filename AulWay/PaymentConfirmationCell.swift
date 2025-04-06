@@ -8,6 +8,9 @@ class PaymentConfirmationCell: UITableViewCell {
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var routeLabel: UILabel!
 
+    @IBOutlet weak var departureLocation: UILabel!
+    @IBOutlet weak var destinationLocation: UILabel!
+    @IBOutlet weak var orderNumber: UILabel!
     @IBOutlet weak var shareButton: UIButton!
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -25,6 +28,9 @@ class PaymentConfirmationCell: UITableViewCell {
             departureTimeLabel.text = formattedTime(slot.start_date)
             arrivalTimeLabel.text = formattedTime(slot.end_date)
             busNumberLabel.text = slot.carNumber?.isEmpty == false ? slot.carNumber : "Не указан"
+            orderNumber.text = ticket.order_number
+            departureLocation.text = slot.departure_location
+            destinationLocation.text = slot.destination_location
         } else {
             routeLabel.text = "Маршрут не найден"
             dateLabel.text = "Дата не указана"

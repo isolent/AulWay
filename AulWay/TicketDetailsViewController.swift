@@ -44,6 +44,14 @@ class TicketDetailsViewController: UIViewController {
         shareButton.isUserInteractionEnabled = true
         let tap = UITapGestureRecognizer(target: self, action: #selector(shareTapped))
         shareButton.addGestureRecognizer(tap)
+        let backButton = UIButton(type: .system)
+        backButton.setTitle("Back", for: .normal)
+        backButton.setTitleColor(.systemBlue, for: .normal)
+        backButton.titleLabel?.font = .systemFont(ofSize: 17)
+        backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+
+        let barButtonItem = UIBarButtonItem(customView: backButton)
+        navigationItem.leftBarButtonItem = barButtonItem
 
     }
 
@@ -122,9 +130,7 @@ class TicketDetailsViewController: UIViewController {
                     self.busNumberLabel.text = slot.carNumber ?? "–"
                     self.departureLocationLabel.text = slot.departure_location
                     self.destinationLocationLabel.text = slot.destination_location
-
                     
-
                     let dateFormatter = DateFormatter()
                     dateFormatter.dateFormat = "dd MMM yyyy"
                     self.dateLabel.text = dateFormatter.string(from: slot.start_date)
@@ -261,5 +267,10 @@ class TicketDetailsViewController: UIViewController {
                 nav.setViewControllers([userTicketsVC], animated: true)
             }
         }
+    }
+    
+    @objc func backButtonTapped() {
+        tabBarController?.selectedIndex = 1
+        navigationController?.popToRootViewController(animated: true)
     }
 }

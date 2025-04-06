@@ -20,6 +20,7 @@ class TicketRefundViewController: BaseViewController {
     @IBOutlet weak var refundAmountLabel: UILabel!
     @IBOutlet weak var agreeCheckbox: UIButton!
     @IBOutlet weak var continueButton: UIButton!
+    @IBOutlet weak var refundRules: UILabel!
     
     var ticket: Ticket?
     var userId: String = ""
@@ -27,16 +28,19 @@ class TicketRefundViewController: BaseViewController {
     private var agreedToRules = false {
         didSet {
             updateContinueButtonState()
+            
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "Возврат билета"
-        print("🧾 TicketRefundViewController loaded")
         setupUI()
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(dismissSelf))
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(refundRulesTapped))
+        refundRules.isUserInteractionEnabled = true
+        refundRules.addGestureRecognizer(tapGesture)
     }
 
     private func setupUI() {
@@ -45,10 +49,6 @@ class TicketRefundViewController: BaseViewController {
             return
         }
 
-        print("🎟️ Ticket ID: \(ticket.id)")
-        print("📅 Start Date: \(ticket.slot.start_date)")
-        print("🚍 Route: \(ticket.slot.departure) → \(ticket.slot.destination)")
-        print("💳 Price: \(ticket.price) ₸")
 
         routeLabel.text = "\(ticket.slot.departure) - \(ticket.slot.destination)"
 
@@ -82,15 +82,16 @@ class TicketRefundViewController: BaseViewController {
         let imageName = agreedToRules ? "checkmark.square.fill" : "square"
         agreeCheckbox.setImage(UIImage(systemName: imageName), for: .normal)
 
-        print("☑️ Agree checkbox state: \(agreedToRules ? "Checked" : "Unchecked")")
     }
 
     @IBAction func agreeCheckboxTapped(_ sender: UIButton) {
         agreedToRules.toggle()
+        if agreedToRules {
+            refundRulesTapped()
+        }
     }
 
     @IBAction func continueButtonTapped(_ sender: UIButton) {
-        print("🔘 Continue button tapped")
         guard agreedToRules else {
             print("❌ User did not agree to refund rules")
             return
@@ -103,21 +104,24 @@ class TicketRefundViewController: BaseViewController {
     }
 
     private func performTicketRefund(ticketId: String) {
-        print("📤 Starting refund for ticketId: \(ticketId)")
-
         guard let token = UserDefaults.standard.string(forKey: "access_token") else {
             print("❌ No auth token found in UserDefaults")
             showAlert(title: "Ошибка", message: "Токен не найден.")
             return
         }
+        
+        guard let email = UserDefaults.standard.string(forKey: "email") else {
+            print("❌ No email found in UserDefaults")
+            showAlert(title: "Ошибка", message: "Email не найден.")
+            return
+        }
 
-        guard let url = URL(string: "\(BASE_URL)/api/tickets/users/\(userId)/\(ticketId)/cancel") else {
+        let encodedEmail = email.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        guard let url = URL(string: "\(BASE_URL)/api/tickets/users/\(userId)/\(ticketId)/cancel?email=\(encodedEmail)") else {
             print("❌ Failed to build refund URL")
             showAlert(title: "Ошибка", message: "Неверный URL.")
             return
         }
-
-        print("🌐 Refund URL: \(url.absoluteString)")
 
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
@@ -154,9 +158,8 @@ class TicketRefundViewController: BaseViewController {
         }.resume()
     }
 
-    private func navigateToUserTickets() {
-        print("🔁 Forcing navigation to UserTicketsViewController via tab bar setup")
 
+    private func navigateToUserTickets() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
 
         guard let tabBarController = storyboard.instantiateViewController(withIdentifier: "Tickets") as? UITabBarController else {
@@ -187,7 +190,6 @@ class TicketRefundViewController: BaseViewController {
     }
 
     @objc private func dismissSelf() {
-        print("⬅️ Dismissing TicketRefundViewController")
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -207,6 +209,20 @@ class TicketRefundViewController: BaseViewController {
         }
 
         return nil
+    }
+    
+    @objc private func refundRulesTapped() {
+        let message = """
+        Возврат возможен только за 24 часов до отправления автобуса.
+        После отправления билета возврат невозможен.
+        При отмене билета средства возвращаются на ту же карту, с которой была произведена оплата.
+        Возврат осуществляется в течение 5–10 рабочих дней в зависимости от банка.
+        Частичный возврат возможен, если в заказе было приобретено несколько билетов.
+        """
+        
+        let alert = UIAlertController(title: "Правила возврата", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 
 }

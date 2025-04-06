@@ -23,7 +23,7 @@ class LoadingViewController: UIViewController {
 
         progressView.progress = 0.0
         resetBusPosition()
-        startBusAnimation(duration: 5.0)
+        startBusAnimation(duration: 1.5)
     }
 
     func resetBusPosition() {

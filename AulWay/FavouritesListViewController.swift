@@ -20,7 +20,7 @@ class FavouritesListViewController: UIViewController, UITableViewDataSource, UIT
     private let prevPageButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("←", for: .normal)
-        button.setTitleColor(.gray, for: .normal)
+        button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 24, weight: .regular)
         button.isEnabled = false
         return button
@@ -29,7 +29,7 @@ class FavouritesListViewController: UIViewController, UITableViewDataSource, UIT
     private let nextPageButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("→", for: .normal)
-        button.setTitleColor(.gray, for: .normal)
+        button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 24, weight: .regular)
         return button
     }()

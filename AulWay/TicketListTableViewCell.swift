@@ -8,7 +8,8 @@ class TicketListTableViewCell: UITableViewCell {
     @IBOutlet weak var route: UILabel!
     @IBOutlet weak var favourite: UIButton!
     @IBOutlet weak var date: UILabel!
-
+    @IBOutlet weak var orderNumber: UILabel!
+    
     var onFavouriteTapped: (() -> Void)?
     private var isFavorite: Bool = false
 
@@ -47,21 +48,41 @@ class TicketListTableViewCell: UITableViewCell {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "HH:mm"
         let timeString = "\(dateFormatter.string(from: slot.start_date)) - \(dateFormatter.string(from: slot.end_date))"
-        time.text = timeString
+        time?.text = timeString
 
         let calendar = Calendar.current
         let components = calendar.dateComponents([.hour, .minute], from: slot.start_date, to: slot.end_date)
         let hours = components.hour ?? 0
         let minutes = components.minute ?? 0
-        duration.text = "\(hours)h \(minutes)m"
+        duration?.text = "\(hours)h \(minutes)m"
 
         route.text = "\(slot.departure) → \(slot.destination)"
-        price.text = "\(slot.price) ₸"
+        price .text = "\(slot.price) ₸"
 
         dateFormatter.dateFormat = "d MMM"
         self.date?.text = dateFormatter.string(from: slot.start_date)
 
         isFavorite = slot.isFavourite ?? false
         updateFavouriteIcon(isFavourite: isFavorite)
+    }
+    
+    func configureRefunded(with ticket: Ticket) {
+        if ticket.path.isEmpty {
+            route.text = "\(ticket.slot.departure) → \(ticket.slot.destination)"
+        } else {
+            route.text = ticket.path
+        }
+
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateFormat = "d MMM"
+        date.text = displayFormatter.string(from: ticket.slot.start_date)
+
+        price.text = "\(ticket.price) ₸"
+
+        orderNumber.text = ticket.order_number
+
+        let components = Calendar.current.dateComponents([.hour, .minute], from: ticket.slot.start_date, to: ticket.slot.end_date)
+        let hours = components.hour ?? 0
+        let minutes = components.minute ?? 0
     }
 }
