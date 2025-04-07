@@ -207,7 +207,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
 
         let hours = components.hour ?? 0
         let minutes = components.minute ?? 0
-        cell.Duration.text = "\(hours)h \(minutes)m"
+        cell.Duration.text = "\(hours)ч \(minutes)м"
 
 
         cell.Path.text = "\(ticket.slot.departure) - \(ticket.slot.destination)"

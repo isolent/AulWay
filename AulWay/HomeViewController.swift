@@ -17,11 +17,11 @@ class HomeViewController: BaseViewController {
     
     var passengerCount: Int = 1 {
         didSet {
-            PassengerInfo.text = "\(passengerCount) passenger"
+            PassengerInfo.text = "\(passengerCount) пассажир"
         }
     }
 
-    var slotCount: Int = 0  
+    var slotCount: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,7 +33,7 @@ class HomeViewController: BaseViewController {
     }
     
     func setupUI() {
-        PassengerInfo.text = "\(passengerCount) passenger"
+        PassengerInfo.text = "\(passengerCount) пассажир"
         PassengerInfo.backgroundColor = UIColor(red: 217/255, green: 217/255, blue: 217/255, alpha: 1.0)
 
         PassengerInfo.layer.cornerRadius = PassengerInfo.frame.height / 2
@@ -45,11 +45,11 @@ class HomeViewController: BaseViewController {
         To.layer.masksToBounds = true
         
         From.attributedPlaceholder = NSAttributedString(
-            string: "From",
+            string: "Откуда",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.white]
         )
         To.attributedPlaceholder = NSAttributedString(
-            string: "To",
+            string: "Куда",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.white]
         )
         
@@ -79,10 +79,10 @@ class HomeViewController: BaseViewController {
             return
         }
         
-        fetchTickets(departure: fromText, destination: toText, date: SelectedDate.date, passengers: passengerCount)
+        fetchRoutes(departure: fromText, destination: toText, date: SelectedDate.date, passengers: passengerCount)
     }
     
-    func fetchTickets(departure: String, destination: String, date: Date, passengers: Int) {
+    func fetchRoutes(departure: String, destination: String, date: Date, passengers: Int) {
         let baseURL = "\(BASE_URL)/api/routes"
         var components = URLComponents(string: baseURL)
         let dateFormatter = DateFormatter()

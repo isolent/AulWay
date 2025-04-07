@@ -116,7 +116,7 @@ class EditProfileViewController: BaseViewController {
                 phoneNumberTextField.text = updatedUser["phone"] as? String ?? ""
 
                 onProfileUpdated?()
-                showAlert(title: "Success", message: "Profile updated successfully.") { _ in
+                showAlert(title: "Success", message: "Профиль успешно обновлен.") { _ in
                     if let searchVC = self.storyboard?.instantiateViewController(withIdentifier: "Tickets") {
                         searchVC.modalPresentationStyle = .fullScreen
                         self.present(searchVC, animated: true, completion: nil)
@@ -124,7 +124,7 @@ class EditProfileViewController: BaseViewController {
                 }
             }
         } catch {
-            showAlert(title: "Ошибка", message: "Failed to parse updated user data.")
+            showAlert(title: "Ошибка", message: "Не удалось проанализировать обновленные пользовательские данные.")
         }
     }
 

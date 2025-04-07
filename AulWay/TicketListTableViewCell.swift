@@ -54,7 +54,7 @@ class TicketListTableViewCell: UITableViewCell {
         let components = calendar.dateComponents([.hour, .minute], from: slot.start_date, to: slot.end_date)
         let hours = components.hour ?? 0
         let minutes = components.minute ?? 0
-        duration?.text = "\(hours)h \(minutes)m"
+        duration?.text = "\(hours)ч \(minutes)м"
 
         route.text = "\(slot.departure) → \(slot.destination)"
         price .text = "\(slot.price) ₸"
