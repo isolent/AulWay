@@ -38,7 +38,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
 
     private let pageLabel: UILabel = {
         let label = UILabel()
-        label.text = "Page 1"
+        label.text = "1"
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 14, weight: .medium)
         label.textColor = .white
@@ -175,7 +175,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
         updatePaginationUI()
     }
     private func updatePaginationUI() {
-        pageLabel.text = "Page \(currentPage)"
+        pageLabel.text = "\(currentPage)"
         let allTickets = currentTicketType == .past ? allPastTickets : allUpcomingTickets
         let totalPages = Int(ceil(Double(allTickets.count) / Double(pageSize)))
 
@@ -211,7 +211,7 @@ class UserTicketsViewController: UIViewController, UITableViewDataSource, UITabl
 
 
         cell.Path.text = "\(ticket.slot.departure) - \(ticket.slot.destination)"
-        cell.Status.text = "Paid"
+        cell.Status.text = "Оплачен"
         cell.CarNumber.text = ticket.slot.carNumber ?? "-"
 
 

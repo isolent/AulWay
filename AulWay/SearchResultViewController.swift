@@ -37,7 +37,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
 
     private let pageLabel: UILabel = {
         let label = UILabel()
-        label.text = "Page 1"
+        label.text = "1"
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 14, weight: .medium)
         label.textColor = .white
@@ -175,7 +175,7 @@ class SearchResultViewController: UIViewController, UITableViewDataSource, UITab
     }
 
     private func updatePaginationUI() {
-        pageLabel.text = "Page \(currentPage)"
+        pageLabel.text = "\(currentPage)"
 
         let totalPages = Int(ceil(Double(allSlots.count) / Double(pageSize)))
 
