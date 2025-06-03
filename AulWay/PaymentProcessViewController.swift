@@ -2,6 +2,7 @@ import UIKit
 
 class PaymentProcessViewController: BaseViewController {
     
+    @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var phoneNumberTextField: UITextField!
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var nameTextField: UITextField!
@@ -15,8 +16,8 @@ class PaymentProcessViewController: BaseViewController {
     var passengerCount: Int = 1
     var tickets: [Ticket] = []
     var paymentId: String = "pm_card_visa"
-
     
+    private var activeField: UITextField?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,6 +29,12 @@ class PaymentProcessViewController: BaseViewController {
         
         payButton.addTarget(self, action: #selector(payButtonTapped), for: .touchUpInside)
         cancelReservationButton.addTarget(self, action: #selector(cancelReservation), for: .touchUpInside)
+        
+        registerForKeyboardNotifications()
+    }
+
+    deinit {
+        unregisterForKeyboardNotifications()
     }
     
     @objc private func payButtonTapped() {
@@ -78,8 +85,6 @@ class PaymentProcessViewController: BaseViewController {
 
         request.httpBody = try? JSONSerialization.data(withJSONObject: requestBody, options: [])
 
-//        print("📤 Отправляем данные: \(requestBody)")
-
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -93,8 +98,6 @@ class PaymentProcessViewController: BaseViewController {
                     self.showAlert(title: "Ошибка", message: "Некорректный ответ сервера.")
                     return
                 }
-
-                print("📡 Статус код сервера: \(httpResponse.statusCode)")
 
                 guard (200...299).contains(httpResponse.statusCode) else {
                     self.navigateToPaymentFailed()
@@ -127,10 +130,8 @@ class PaymentProcessViewController: BaseViewController {
 
     private func saveTicketsToUserDefaults() {
         do {
-            
             let encodedData = try JSONEncoder().encode(tickets)
             UserDefaults.standard.set(encodedData, forKey: "savedTickets")
-
         } catch {
             print("❌ Ошибка сохранения билетов: \(error.localizedDescription)")
         }
@@ -143,35 +144,98 @@ class PaymentProcessViewController: BaseViewController {
             self.present(confirmationVC, animated: true, completion: nil)
         }
     }
+
     private func navigateToPaymentFailed() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         if let failedVC = storyboard.instantiateViewController(withIdentifier: "PaymentFailedViewController") as? PaymentFailedViewController {
-            self.present(failedVC, animated: true, completion: nil)
-            failedVC.passengerCount=passengerCount
+            failedVC.passengerCount = passengerCount
             failedVC.id = id
+            self.present(failedVC, animated: true, completion: nil)
         }
     }
 
-    
     private func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
-
     
+    // MARK: - Keyboard Handling
+
+    private func registerForKeyboardNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow),
+                                               name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide),
+                                               name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+
+    private func unregisterForKeyboardNotifications() {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        guard let userInfo = notification.userInfo,
+              let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+
+        let keyboardHeight = keyboardFrame.height
+        scrollView.contentInset.bottom = keyboardHeight + 20
+        scrollView.scrollIndicatorInsets.bottom = keyboardHeight + 20
+
+        if let activeField = activeField {
+            var visibleRect = view.frame
+            visibleRect.size.height -= keyboardHeight
+            let fieldFrame = activeField.convert(activeField.bounds, to: view)
+            if !visibleRect.contains(fieldFrame.origin) {
+                scrollView.scrollRectToVisible(fieldFrame, animated: true)
+            }
+        }
+    }
+
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        scrollView.contentInset.bottom = 0
+        scrollView.scrollIndicatorInsets.bottom = 0
+    }
+}
+
+// MARK: - UITextFieldDelegate
+
+extension PaymentProcessViewController: UITextFieldDelegate {
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        activeField = textField
+    }
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        activeField = nil
+    }
+
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if textField == cardNumberTextField {
+            return formatCardNumber(in: textField, range: range, replacementString: string)
+        } else if textField == expirationTextField {
+            return formatExpirationDate(in: textField, range: range, replacementString: string)
+        } else if textField == cvcTextField {
+            return formatCVC(in: textField, range: range, replacementString: string)
+        } else if textField == phoneNumberTextField {
+            return formatPhoneNumber(in: textField, range: range, replacementString: string)
+        } else if textField == nameTextField {
+            let allowed = CharacterSet.letters.union(.whitespaces)
+            return string.rangeOfCharacter(from: allowed.inverted) == nil
+        } else if textField == emailTextField {
+            return true
+        }
+        return true
+    }
+
     private func formatCardNumber(in textField: UITextField, range: NSRange, replacementString string: String) -> Bool {
         guard let text = textField.text else { return false }
-        let newString = (text as NSString).replacingCharacters(in: range, with: string)
-            .replacingOccurrences(of: " ", with: "")
-        
+        let newString = (text as NSString).replacingCharacters(in: range, with: string).replacingOccurrences(of: " ", with: "")
         let trimmed = String(newString.prefix(16))
         let formatted = stride(from: 0, to: trimmed.count, by: 4).map {
             let start = trimmed.index(trimmed.startIndex, offsetBy: $0)
             let end = trimmed.index(start, offsetBy: 4, limitedBy: trimmed.endIndex) ?? trimmed.endIndex
             return String(trimmed[start..<end])
         }.joined(separator: " ")
-
         textField.text = formatted
         return false
     }
@@ -233,30 +297,5 @@ class PaymentProcessViewController: BaseViewController {
 
         textField.text = formatted
         return false
-    }
-
-}
-
-
-extension PaymentProcessViewController: UITextFieldDelegate {
-    
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        
-        if textField == cardNumberTextField {
-            return formatCardNumber(in: textField, range: range, replacementString: string)
-        } else if textField == expirationTextField {
-            return formatExpirationDate(in: textField, range: range, replacementString: string)
-        } else if textField == cvcTextField {
-            return formatCVC(in: textField, range: range, replacementString: string)
-        } else if textField == phoneNumberTextField {
-            return formatPhoneNumber(in: textField, range: range, replacementString: string)
-        } else if textField == nameTextField {
-            let allowed = CharacterSet.letters.union(.whitespaces)
-            return string.rangeOfCharacter(from: allowed.inverted) == nil
-        } else if textField == emailTextField {
-            return true
-        }
-        
-        return true
     }
 }

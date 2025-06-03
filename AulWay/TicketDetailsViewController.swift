@@ -134,6 +134,7 @@ class TicketDetailsViewController: UIViewController {
                     let dateFormatter = DateFormatter()
                     dateFormatter.dateFormat = "dd MMM yyyy"
                     self.dateLabel.text = dateFormatter.string(from: slot.start_date)
+                    self.startDate = slot.start_date
                 }
             } catch {
                 print("❌ Route decoding error: \(error)")
@@ -217,6 +218,18 @@ class TicketDetailsViewController: UIViewController {
     @IBAction func cancelTicketTapped(_ sender: UIButton) {
         guard let ticket = ticket else { return }
 
+        guard let ticketStartDate = startDate else {
+            showAlert(title: "Ошибка", message: "Дата отправления недоступна.")
+            return
+        }
+
+        let now = Date()
+        
+        if now >= ticketStartDate {
+            showAlert(title: "Билет не подлежит возврату", message: "Вы не можете вернуть билет, так как время отправления уже прошло.")
+            return
+        }
+
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         if let refundVC = storyboard.instantiateViewController(withIdentifier: "TicketRefundViewController") as? TicketRefundViewController {
             refundVC.ticket = ticket
@@ -227,6 +240,8 @@ class TicketDetailsViewController: UIViewController {
             present(navController, animated: true)
         }
     }
+
+
 
     
 

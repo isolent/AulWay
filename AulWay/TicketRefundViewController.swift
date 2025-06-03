@@ -81,8 +81,8 @@ class TicketRefundViewController: BaseViewController {
 
         let imageName = agreedToRules ? "checkmark.square.fill" : "square"
         agreeCheckbox.setImage(UIImage(systemName: imageName), for: .normal)
-
     }
+
 
     @IBAction func agreeCheckboxTapped(_ sender: UIButton) {
         agreedToRules.toggle()
